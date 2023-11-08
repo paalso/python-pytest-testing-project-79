@@ -2,7 +2,7 @@
 name: 'lint&test'
 
 # список событий, на который экшен должен запускаться
-on:  push
+on: [push, pull_request]
 
 # список того, что нужно делать
 # каждый job будет выводиться отдельным элементом слева UI
@@ -14,7 +14,7 @@ jobs:
       matrix:
         # we want to test our package on several versions of Python
         # python-version: [3.6, 3.7, 3.8, 3.9], but let's leave so:
-        python-version: [3.8]
+        python-version: [3.10]
 
     steps:
     # uses указывает имена уже написанных экшенов, к-е хотим использовать
@@ -32,8 +32,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
       
     # Gr1N/setup-poetry@v7 устанавливает python poetry
-    - name: Set up Poetry for Python
-      uses: Gr1N/setup-poetry@v7
+    - name: setup/install python poetry
+      uses: trim21/setup-poetry@dist/v2
     # т.к. flake8 и pytest уже есть в dev-зависимостях
     # проекта (описаны в pyproject.toml) в [tool.poetry.dev-dependencies]
     # отдельно их устанавливать не нужно (по идее)
