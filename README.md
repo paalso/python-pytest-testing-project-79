@@ -5,7 +5,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/9d3fdbfa648873809ba9/maintainability)](https://codeclimate.com/github/paalso/python-pytest-testing-project-79/maintainability)
 
 ##### Code Climate test coverage status
-<a href="https://codeclimate.com/github/paalso/python-pytest-testing-project-79/test_coverage"><img src="https://api.codeclimate.com/v1/badges/9d3fdbfa648873809ba9/test_coverage" /></a>
-
-##### Pytests and flake8 linter status
 [![Test Coverage](https://api.codeclimate.com/v1/badges/9d3fdbfa648873809ba9/test_coverage)](https://codeclimate.com/github/paalso/python-pytest-testing-project-79/test_coverage)
+
+##### Local pytests and flake8 linter status
+[![lint&test](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/lint-test.yml/badge.svg)](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/lint-test.yml)
