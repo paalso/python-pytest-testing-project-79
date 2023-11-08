@@ -10,6 +10,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
     strategy:
       matrix:
         # we want to test our package on several versions of Python
@@ -33,7 +34,7 @@ jobs:
       
     # Gr1N/setup-poetry@v7 устанавливает python poetry
     - name: setup/install python poetry
-      uses: trim21/setup-poetry@dist/v2
+      uses: SG60/setup-poetry@v1
     # т.к. flake8 и pytest уже есть в dev-зависимостях
     # проекта (описаны в pyproject.toml) в [tool.poetry.dev-dependencies]
     # отдельно их устанавливать не нужно (по идее)
