@@ -4,10 +4,10 @@ import requests
 
 
 def download(url, path=None):
-    path = path or os.getcwd()
+    path = path or ''
     path_to_save_web_content = os.path.join(
         path,
-        get_filename_for_saving_web_content(url)    
+        _get_filename_for_saving_web_content(url)
     )
 
     request = requests.get(url)
@@ -19,11 +19,11 @@ def download(url, path=None):
     return path_to_save_web_content
 
 
-def get_filename_for_saving_web_content(url):
+def _get_filename_for_saving_web_content(url):
     if url.startswith('http'):
         _, url = url.split('//')
     url = url.rstrip('/')
-    
+
     separators = re.compile(r'[./]')
     url_tokens = separators.split(url)
     base_filename = '-'.join(url_tokens)
