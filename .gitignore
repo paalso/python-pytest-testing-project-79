@@ -1,0 +1,11 @@
+*.egg-info
+__pycache__
+dist/
+_sample_inputs/
+*.pyc
+.venv/
+.coverage
+coverage.xml
+.pytest_cache/
+.vim
+.vscode
