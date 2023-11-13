@@ -4,6 +4,7 @@ import tempfile
 
 from page_loader.page_loader import download
 from page_loader.page_loader import _get_filename_for_saving_web_content
+from page_loader.page_loader import _get_dirname_for_saving_web_resources
 
 
 def test_download():
@@ -59,3 +60,9 @@ def test_get_filename_for_saving_web_content():
     assert _get_filename_for_saving_web_content(
         'ru.hexlet.io'
     ) == 'ru-hexlet-io.html'
+
+
+def test_get_dirname_for_saving_web_resources():
+    assert _get_dirname_for_saving_web_resources(
+        'ru-hexlet-io-courses.html'
+    ) == 'ru-hexlet-io-courses_files'
