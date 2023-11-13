@@ -29,3 +29,8 @@ def _get_filename_for_saving_web_content(url):
     base_filename = '-'.join(url_tokens)
 
     return f'{base_filename}.html'
+
+
+def _get_dirname_for_saving_web_resources(content_filename):
+    basename, _ = content_filename.split('.')
+    return f'{basename}_files'
