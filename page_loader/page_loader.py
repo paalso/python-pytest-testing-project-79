@@ -11,15 +11,17 @@ class PageLoader:
             self.path,
             self.__get_filename_for_saving_web_content()
         )
+        self.page_content = self.__get_page_content()
 
     def download(self):
-        request = requests.get(self.url)
-        content_to_save = request.text
-
         with open(self.path_to_save_web_content, 'w') as f:
-            f.write(content_to_save)
+            f.write(self.page_content)
 
         return self.path_to_save_web_content
+
+    def __get_page_content(self):
+        request = requests.get(self.url)
+        return request.text
 
     def __get_filename_for_saving_web_content(self):
         if self.url.startswith('http'):
