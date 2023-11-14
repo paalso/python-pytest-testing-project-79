@@ -12,6 +12,7 @@ page-loader = "page_loader.scripts.main:main"
 [tool.poetry.dependencies]
 python = "^3.9"
 requests = "^2.31.0"
+beautifulsoup4 = "^4.12.2"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
