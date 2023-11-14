@@ -1,13 +1,27 @@
 import os
 import requests_mock
 import tempfile
+import pytest
 
 from page_loader.page_loader import download
 
 
-def test_download():
+@pytest.fixture
+def expected_content():
+    path = os.path.join('tests', 'fixtures', 'expected.html')
+    with open(path) as f:
+        return f.read()
+
+
+@pytest.fixture
+def retrieved_content():
+    path = os.path.join('tests', 'fixtures', 'retrieved.html')
+    with open(path) as f:
+        return f.read()
+
+
+def test_download(expected_content, retrieved_content):
     url = 'https://ru.hexlet.io/courses'
-    expected_content = 'Test content'
     subdir = 'some_dir/subdir'
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -15,7 +29,7 @@ def test_download():
         os.makedirs(subdir_path)
 
         with requests_mock.Mocker() as m:
-            m.get(url, text=expected_content)
+            m.get(url, text=retrieved_content)
 
             result_path = download(url, path=subdir_path)
 
