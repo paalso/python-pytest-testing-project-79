@@ -22,7 +22,7 @@ def retrieved_content():
 
 def test_download(expected_content, retrieved_content):
     url = 'https://ru.hexlet.io/courses'
-    subdir = 'some_dir/subdir'
+    subdir = os.path.join('some_dir', 'subdir')
 
     with tempfile.TemporaryDirectory() as temp_dir:
         subdir_path = os.path.join(temp_dir, subdir)
@@ -36,10 +36,20 @@ def test_download(expected_content, retrieved_content):
             assert os.path.isfile(result_path)
             with open(result_path, 'r') as f:
                 assert f.read() == expected_content
-            expected_path = os.path.join(
+
+            expected_saved_html_path = os.path.join(
                 subdir_path, 'ru-hexlet-io-courses.html')
-            assert os.path.exists(expected_path)
-            assert result_path == expected_path
+            assert os.path.isfile(expected_saved_html_path)
+            assert result_path == expected_saved_html_path
+
+            expected_saved_resources_dir_path = os.path.join(
+                subdir_path, 'ru-hexlet-io-courses_files')
+            assert os.path.isdir(expected_saved_resources_dir_path)
+
+            expected_saved_image_path = os.path.join(
+                expected_saved_resources_dir_path,
+                'ru-hexlet-io-assets-professions-python.png')
+            assert os.path.isfile(expected_saved_image_path)
 
 
 def test_download_return_value_with_none_path():
