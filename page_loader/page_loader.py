@@ -15,6 +15,8 @@ class PageLoader:
     def __init__(self, url, path=None):
         path = path or ''
         self.url = url
+        netloc = url_utils.netloc(url)
+        self.netloc_prefix = netloc.replace('.', '-')
         self.path_to_save_page_content = os.path.join(
             path, url_utils.filename_from_url(self.url))
         self.resources_dir = url_utils.dirname_for_web_resources(
@@ -69,7 +71,7 @@ class PageLoader:
     def __get_path_to_save_recourse(self, resource_url):
         return os.path.join(
             self.resources_path,
-            url_utils.filename_from_url(resource_url))
+            f'{self.netloc_prefix}-{url_utils.filename_from_url(resource_url)}')
 
     @staticmethod
     def __download_resource(url, save_path):
