@@ -3,10 +3,17 @@ import requests_mock
 import tempfile
 import pytest
 import shutil
+from bs4 import BeautifulSoup
 
 from page_loader.page_loader import download
 
 URL = 'https://ru.hexlet.io/courses'
+
+
+def compare_prettified_htmls(html_content1, html_content2):
+    soap1 = BeautifulSoup(html_content1, 'html.parser')
+    soap2 = BeautifulSoup(html_content2, 'html.parser')
+    return soap1.prettify() == soap2.prettify()
 
 
 @pytest.fixture
@@ -39,9 +46,22 @@ def cleanup_downloaded_files():
 def setup_mocking(retrieved_content):
     with requests_mock.Mocker() as m:
         m.get(URL, text=retrieved_content)
+
+        # Mock the image resource
         image_url = 'https://ru.hexlet.io/assets/professions/python.png'
         image_content = b'Some image content'
         m.get(image_url, content=image_content)
+
+        # Mock the script resource
+        script_url = 'https://ru.hexlet.io/packs/js/runtime.js'
+        script_content = b'Some script content'
+        m.get(script_url, content=script_content)
+
+        # Mock the stylesheet resource
+        stylesheet_url = 'https://ru.hexlet.io/assets/application.css'
+        stylesheet_content = b'Some stylesheet content'
+        m.get(stylesheet_url, content=stylesheet_content)
+
         return m
 
 
@@ -74,7 +94,9 @@ def test_download_html(
         )
         assert result_path == expected_saved_html_path
         with open(result_path, 'r') as f:
-            assert f.read() == expected_content
+            # assert f.read() == expected_content
+            # import pdb; pdb.set_trace()
+            assert compare_prettified_htmls(f.read(), expected_content)
 
 
 def test_download_resources(
