@@ -12,6 +12,9 @@ def test_filename_from_url():
     assert (filename_from_url("assets/img/omelette.png")
             == "assets-img-omelette.png")
 
+    assert (filename_from_url("/assets/img/omelette.png")
+            == "assets-img-omelette.png")
+
     assert (
         filename_from_url("https://lorem.dot.net/assets/omelette.html")
         == "lorem-dot-net-assets-omelette.html"

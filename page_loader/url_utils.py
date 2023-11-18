@@ -6,6 +6,7 @@ def filename_from_url(url):
     """
     Generate a filename from a (possibly partial) url
     """
+    url = url.lstrip('/')
     parsed_url = urlparse(url)
     netloc_part = parsed_url.netloc.replace('.', '-')
     path_part = parsed_url.path.replace('/', '-').rstrip('-')
