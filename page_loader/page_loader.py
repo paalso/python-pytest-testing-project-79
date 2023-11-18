@@ -8,6 +8,7 @@ class PageLoader:
     RESOURCE_TAGS = {
         'img': 'src',
         'link': 'href',
+        'script': 'src',
         'video': 'src',
         'audio': 'src'
     }
@@ -25,7 +26,9 @@ class PageLoader:
             self.path_to_save_page_content)
         original_page_content = self.__get_raw_page_content()
         self.soup = BeautifulSoup(original_page_content, 'html.parser')
+
         self.ignore_other_hosts = True
+        self.prettify = True
 
     def download(self):
         self.__download_resources()
@@ -33,7 +36,10 @@ class PageLoader:
         return self.path_to_save_page_content
 
     def __download_page(self):
-        processed_page_content = self.soup.prettify()
+        if self.prettify:
+            processed_page_content = self.soup.prettify()
+        else:
+            processed_page_content = str(self.soup)
         with open(self.path_to_save_page_content, 'w') as f:
             f.write(processed_page_content)
 
