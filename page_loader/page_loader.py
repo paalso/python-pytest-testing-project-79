@@ -15,8 +15,8 @@ class PageLoader:
     def __init__(self, url, path=None):
         path = path or ''
         self.url = url
-        netloc = url_utils.netloc(url)
-        self.netloc_prefix = netloc.replace('.', '-')
+        self.netloc = url_utils.netloc(url)
+        self.netloc_prefix = self.netloc.replace('.', '-')
         self.path_to_save_page_content = os.path.join(
             path, url_utils.filename_from_url(self.url))
         self.resources_dir = url_utils.dirname_for_web_resources(
@@ -25,6 +25,7 @@ class PageLoader:
             self.path_to_save_page_content)
         original_page_content = self.__get_raw_page_content()
         self.soup = BeautifulSoup(original_page_content, 'html.parser')
+        self.ignore_other_hosts = True
 
     def download(self):
         self.__download_resources()
@@ -41,16 +42,23 @@ class PageLoader:
             os.makedirs(self.resources_path)
 
         for resource in self.__get_page_resources():
-            resource_path = self.__get_resource_path(resource)
-            resource_full_url = url_utils.full_url(self.url, resource_path)
-            path_to_save = self.__get_path_to_save_recourse(resource_path)
-            self.__download_resource(resource_full_url, path_to_save)
+            self.__process_resource(resource)
 
-            new_resource_basename = os.path.basename(path_to_save)
-            new_resource_path = os.path.join(
-                self.resources_dir, new_resource_basename)
-            resource_link_attr = self.__get_resource_link_attr(resource)
-            resource[resource_link_attr] = new_resource_path
+    def __process_resource(self, resource):
+        resource_path = self.__get_resource_path(resource)
+        resource_full_url = url_utils.full_url(self.url, resource_path)
+        resource_netloc = url_utils.netloc(resource_full_url)
+        if self.ignore_other_hosts and resource_netloc != self.netloc:
+            return
+
+        path_to_save = self.__get_path_to_save_recourse(resource_path)
+        self.__download_resource(resource_full_url, path_to_save)
+
+        new_resource_basename = os.path.basename(path_to_save)
+        new_resource_path = os.path.join(
+            self.resources_dir, new_resource_basename)
+        resource_link_attr = self.__get_resource_link_attr(resource)
+        resource[resource_link_attr] = new_resource_path
 
     def __get_resource_link_attr(self, resource):
         resource_name = resource.name

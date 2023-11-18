@@ -89,7 +89,6 @@ def test_download_resources(
 
         expected_saved_image_path = os.path.join(
             expected_saved_resources_dir_path,
-            # 'assets-professions-python.png',
             'ru-hexlet-io-assets-professions-python.png',
         )
         assert os.path.isfile(expected_saved_image_path)
