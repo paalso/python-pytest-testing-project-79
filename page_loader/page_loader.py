@@ -1,36 +1,106 @@
 import os
-import re
 import requests
+from bs4 import BeautifulSoup
+from . import url_utils
+
+
+class PageLoader:
+    RESOURCE_TAGS = {
+        'img': 'src',
+        'link': 'href',
+        'script': 'src',
+        'video': 'src',
+        'audio': 'src'
+    }
+
+    def __init__(self, url, path=None):
+        path = path or ''
+        self.url = url
+        self.netloc = url_utils.netloc(url)
+        self.netloc_prefix = self.netloc.replace('.', '-')
+        self.path_to_save_page_content = os.path.join(
+            path, url_utils.filename_from_url(self.url))
+        self.resources_dir = url_utils.dirname_for_web_resources(
+            url_utils.filename_from_url(self.url))
+        self.resources_path = url_utils.dirname_for_web_resources(
+            self.path_to_save_page_content)
+        original_page_content = self.__get_raw_page_content()
+        self.soup = BeautifulSoup(original_page_content, 'html.parser')
+
+        self.ignore_other_hosts = True
+        self.prettify = True
+
+    def download(self):
+        self.__download_resources()
+        self.__download_page()
+        return self.path_to_save_page_content
+
+    def __download_page(self):
+        if self.prettify:
+            processed_page_content = self.soup.prettify()
+        else:
+            processed_page_content = str(self.soup)
+        with open(self.path_to_save_page_content, 'w') as f:
+            f.write(processed_page_content)
+
+    def __download_resources(self):
+        if self.__get_page_resources():
+            os.makedirs(self.resources_path)
+
+        for resource in self.__get_page_resources():
+            self.__process_resource(resource)
+
+    def __process_resource(self, resource):
+        resource_path = self.__get_resource_path(resource)
+        resource_full_url = url_utils.full_url(self.url, resource_path)
+        resource_netloc = url_utils.netloc(resource_full_url)
+        if self.ignore_other_hosts and resource_netloc != self.netloc:
+            return
+
+        path_to_save = self.__get_path_to_save_recourse(resource_path)
+        self.__download_resource(resource_full_url, path_to_save)
+
+        new_resource_basename = os.path.basename(path_to_save)
+        new_resource_path = os.path.join(
+            self.resources_dir, new_resource_basename)
+        resource_link_attr = self.__get_resource_link_attr(resource)
+        resource[resource_link_attr] = new_resource_path
+
+    def __get_resource_link_attr(self, resource):
+        resource_name = resource.name
+        return self.__class__.RESOURCE_TAGS[resource_name]
+
+    def __get_resource_path(self, resource):
+        resource_link_attr = self.__get_resource_link_attr(resource)
+        return resource.get(resource_link_attr)
+
+    def __get_raw_page_content(self):
+        request = requests.get(self.url)
+        return request.text
+
+    def __get_page_resources(self):
+        return [resource for tag in self.__class__.RESOURCE_TAGS
+                for resource in self.soup.find_all(tag)]
+
+    def __get_path_to_save_recourse(self, resource_url):
+        base_path_to_save = url_utils.filename_from_url(resource_url)
+        if not base_path_to_save.startswith(self.netloc_prefix):
+            base_path_to_save = f'{self.netloc_prefix}-{base_path_to_save}'
+        return os.path.join(self.resources_path, base_path_to_save)
+
+    @staticmethod
+    def __download_resource(url, save_path):
+        response = requests.get(url)
+        if response.ok:
+            with open(save_path, 'wb') as f:
+                f.write(response.content)
+            print(f"resource file '{url}' downloaded successfully"
+                  f"and saved to '{save_path}'")
+        else:
+            print(f"Failed to download resource."
+                  f"Status code: {response.status_code}")
 
 
 def download(url, path=None):
-    path = path or ''
-    path_to_save_web_content = os.path.join(
-        path,
-        _get_filename_for_saving_web_content(url)
-    )
-
-    request = requests.get(url)
-    content_to_save = request.text
-
-    with open(path_to_save_web_content, 'w') as f:
-        f.write(content_to_save)
-
-    return path_to_save_web_content
-
-
-def _get_filename_for_saving_web_content(url):
-    if url.startswith('http'):
-        _, url = url.split('//')
-    url = url.rstrip('/')
-
-    separators = re.compile(r'[./]')
-    url_tokens = separators.split(url)
-    base_filename = '-'.join(url_tokens)
-
-    return f'{base_filename}.html'
-
-
-def _get_dirname_for_saving_web_resources(content_filename):
-    basename, _ = content_filename.split('.')
-    return f'{basename}_files'
+    page_loader = PageLoader(url, path)
+    return page_loader.download()
