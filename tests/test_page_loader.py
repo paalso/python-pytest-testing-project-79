@@ -94,8 +94,6 @@ def test_download_html(
         )
         assert result_path == expected_saved_html_path
         with open(result_path, 'r') as f:
-            # assert f.read() == expected_content
-            # import pdb; pdb.set_trace()
             assert compare_prettified_htmls(f.read(), expected_content)
 
 

@@ -83,9 +83,10 @@ class PageLoader:
                 for resource in self.soup.find_all(tag)]
 
     def __get_path_to_save_recourse(self, resource_url):
-        return os.path.join(
-            self.resources_path,
-            f'{self.netloc_prefix}-{url_utils.filename_from_url(resource_url)}')
+        base_path_to_save = url_utils.filename_from_url(resource_url)
+        if not base_path_to_save.startswith(self.netloc_prefix):
+            base_path_to_save = f'{self.netloc_prefix}-{base_path_to_save}'
+        return os.path.join(self.resources_path, base_path_to_save)
 
     @staticmethod
     def __download_resource(url, save_path):
