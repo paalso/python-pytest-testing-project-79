@@ -52,9 +52,9 @@ def setup_mocking(retrieved_content):
         inner_image1_content = b'Some image content'
         m.get(inner_image1_url, content=inner_image1_content)
 
-        inner_image2_url = 'https://ru.hexlet.io/assets/professions/python.jpg'  # Updated URL
-        inner_image2_content = b'Some updated image content'  # You can update the content if needed
-        m.get(inner_image2_url, content=inner_image2_content)  # Updated mock for the modified image
+        inner_image2_url = 'https://ru.hexlet.io/assets/professions/python.jpg'
+        inner_image2_content = b'Some updated image content'
+        m.get(inner_image2_url, content=inner_image2_content)
 
         external_image_url = 'https://external.net/images/external-image.png'
         external_image_content = b'Some external image content'

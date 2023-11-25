@@ -8,10 +8,20 @@ def filename_from_url(url):
     """
     url = url.lstrip('/')
     parsed_url = urlparse(url)
-    netloc_part = parsed_url.netloc.replace('.', '-')
+    domain = parsed_url.netloc.replace('.', '-')
     path_part = parsed_url.path.replace('/', '-').rstrip('-')
     ext = '' if extension(url) else '.html'
-    return f'{netloc_part}{path_part}{ext}'
+    return f'{domain}{path_part}{ext}'
+
+
+def filename_from_full_url(url):
+    """
+    Generate a filename from a full url
+    """
+    parsed_url = urlparse(url)
+    domain = parsed_url.netloc.replace('.', '-')
+    path_part = parsed_url.path.replace('/', '-').rstrip('-')
+    return f'{domain}{path_part}'
 
 
 def dirname_for_web_resources(content_filename, suffix='files'):
@@ -23,7 +33,26 @@ def dirname_for_web_resources(content_filename, suffix='files'):
     return f'{basename}_{suffix}'
 
 
-def full_url(prefix, url):
+def full_url(url, file_name='index.html'):
+    if url == full_domain(url):
+        return url
+
+    if not extension(url):
+        url = f'{url.rstrip("/")}/{file_name}'
+
+    return url
+
+
+def base_url(url):
+    print(f'before: {url}')
+    url_file_name = file_name(url)
+    if url_file_name:
+        url = url.rstrip(url_file_name)
+    print(f'afters: {url}')
+    return url
+
+
+def full_resource_url(prefix, url):
     if scheme(url):
         return url
     return urljoin(prefix, url)
@@ -33,11 +62,22 @@ def scheme(url):
     return urlparse(url).scheme
 
 
-def netloc(url):
+def domain(url):
     return urlparse(url).netloc
+
+
+def full_domain(url):
+    return f'{scheme(url)}://{domain(url)}'
 
 
 def extension(url):
     path = urlparse(url).path
     _, extension = os.path.splitext(path)
     return extension[1:]
+
+
+def file_name(url):
+    file_name = os.path.basename(url)
+    if file_name == domain(url):
+        return ''
+    return file_name
