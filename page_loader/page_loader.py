@@ -45,6 +45,7 @@ class PageLoader:
 
     def __process_resource(self, resource):
         resource_path = self.__path_processor.get_resource_url(resource)
+
         if self.__ignore_other_hosts and \
            self.__path_processor.is_other_domain(resource_path):
             return
@@ -58,8 +59,10 @@ class PageLoader:
 
         new_resource_link = (
             self.__path_processor.get_resource_updated_link(resource_path))
+
         resource_link_attr = (
             self.__path_processor.get_resource_link_attr(resource))
+
         resource[resource_link_attr] = new_resource_link
 
     def __get_raw_page_content(self):

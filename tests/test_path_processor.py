@@ -1,10 +1,11 @@
+# tests/test_path_processor.py
 import os.path
 
 import pytest
 from bs4 import BeautifulSoup
 from page_loader.path_processor import PathProcessor
 
-resource_rags = {
+resource_tags = {
     'img': 'src',
     'link': 'href',
     'script': 'src',
@@ -19,8 +20,8 @@ all_possible_urls = [
 
 @pytest.fixture
 def path_processor(url):
-    pg = PathProcessor(url, resource_rags, 'some_path')
-    return pg
+    pp = PathProcessor(url, resource_tags, 'some_path')
+    return pp
 
 
 @pytest.fixture
@@ -76,6 +77,14 @@ def test_get_recourse_full_url(path_processor):
     resource_url = 'assets/professions/python.png'
     assert (path_processor.get_resource_full_url(resource_url)
             == 'https://ru.hexlet.io/courses/assets/professions/python.png')
+
+
+def test_make_resources_dir(tmp_path):
+    pp = PathProcessor('https://example.com', resource_tags, path=tmp_path)
+    assert not os.path.exists(pp.resources_path)
+    pp.make_resources_dir()
+    assert os.path.exists(pp.resources_path)
+    assert os.path.isdir(pp.resources_path)
 
 
 @pytest.mark.parametrize(

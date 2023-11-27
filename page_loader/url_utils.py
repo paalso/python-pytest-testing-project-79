@@ -44,11 +44,10 @@ def full_url(url, file_name='index.html'):
 
 
 def base_url(url):
-    if extension(url):
-        url_file_name = file_name(url)
-        return url.rstrip(url_file_name)
-
-    return base_url(full_url(url))
+    if not extension(url):
+        url = full_url(url)
+    url_file_name = file_name(url)
+    return url.rstrip(url_file_name)
 
 
 def scheme(url):
