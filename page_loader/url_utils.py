@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 
 
 def filename_from_url(url):
@@ -38,24 +38,17 @@ def full_url(url, file_name='index.html'):
         return url
 
     if not extension(url):
-        url = f'{url.rstrip("/")}/{file_name}'
+        url = f"{url.rstrip('/')}/{file_name}"
 
     return url
 
 
 def base_url(url):
-    print(f'before: {url}')
-    url_file_name = file_name(url)
-    if url_file_name:
-        url = url.rstrip(url_file_name)
-    print(f'afters: {url}')
-    return url
+    if extension(url):
+        url_file_name = file_name(url)
+        return url.rstrip(url_file_name)
 
-
-def full_resource_url(prefix, url):
-    if scheme(url):
-        return url
-    return urljoin(prefix, url)
+    return base_url(full_url(url))
 
 
 def scheme(url):
@@ -81,3 +74,7 @@ def file_name(url):
     if file_name == domain(url):
         return ''
     return file_name
+
+
+def is_absolute_path(url):
+    return url.startswith('/')
