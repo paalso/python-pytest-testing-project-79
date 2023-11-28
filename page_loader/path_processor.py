@@ -1,6 +1,13 @@
 # page_loader/path_processor.py
 import os
+from datetime import datetime
+import logging
 from . import url_utils
+
+LOGS_DIR = 'logs'
+LOG_FILE_TEMPLATE = 'download_{date_time}.log'
+TIME_FORMAT = '%Y%m%d_%H%M%S'
+os.environ['DEBUG'] = 'true'
 
 
 class PathProcessor:
@@ -19,32 +26,47 @@ class PathProcessor:
         self.resources_path = url_utils.dirname_for_web_resources(
             self.path_to_save_page_content)
 
+        if os.environ.get('DEBUG', '').lower() == 'true':
+            self.__setup_logger()
+
     def get_resource_url(self, resource):
         resource_link_attr = self.get_resource_link_attr(resource)
-        return resource.get(resource_link_attr)
+        url = resource.get(resource_link_attr)
+        self.logger.debug(f"Resource URL: {url}")
+        return url
 
     def get_resource_full_url(self, resource_path):
         if url_utils.domain(resource_path):
+            self.logger.debug(f"Resource is an absolute URL: {resource_path}")
             return resource_path
 
         if url_utils.is_absolute_path(resource_path):
-            return f'{self.__full_domain}{resource_path}'
+            full_url = f'{self.__full_domain}{resource_path}'
+            self.logger.debug(f"Full URL for absolute path: {full_url}")
+            return full_url
 
-        return f'{self.__base_url}{resource_path}'
+        full_url = f'{self.__base_url}{resource_path}'
+        self.logger.debug(f"Full URL for relative path: {full_url}")
+        return full_url
 
     # TODO: test it
     def make_resources_dir(self):
         os.makedirs(self.resources_path)
+        self.logger.info(f"Created resources directory: {self.resources_path}")
 
     # Refactoring is needed again
     # Move a resource processing logic to a separate class
     def get_resource_updated_link(self, resource_full_url):
         base_path_to_save = url_utils.filename_from_full_url(resource_full_url)
-        return os.path.join(self.__resources_dir, base_path_to_save)
+        updated_link = os.path.join(self.__resources_dir, base_path_to_save)
+        self.logger.debug(f"Updated resource link: {updated_link}")
+        return updated_link
 
     def get_path_to_save_resource(self, resource_full_url):
         resource_new_link = self.get_resource_updated_link(resource_full_url)
-        return os.path.join(self.__path, resource_new_link)
+        path_to_save = os.path.join(self.__path, resource_new_link)
+        self.logger.info(f"Path to save resource: {path_to_save}")
+        return path_to_save
 
     def get_resource_link_attr(self, resource):
         resource_name = resource.name
@@ -53,3 +75,12 @@ class PathProcessor:
     def is_other_domain(self, resource_url):
         resource_domain = url_utils.domain(resource_url)
         return resource_domain != '' and resource_domain != self.__domain
+
+    def __setup_logger(self):
+        log_file_path = os.path.join(
+            LOGS_DIR,
+            LOG_FILE_TEMPLATE.format(
+                date_time=datetime.now().strftime(TIME_FORMAT)))
+        logging.basicConfig(filename=log_file_path, level=logging.DEBUG)
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.StreamHandler())
