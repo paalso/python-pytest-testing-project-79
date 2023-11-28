@@ -10,7 +10,8 @@ class PageLoader:
         'link': 'href',
         'script': 'src',
         'video': 'src',
-        'audio': 'src'
+        'audio': 'src',
+        'source': 'srcset'
     }
 
     def __init__(self, url, path=None):
@@ -54,11 +55,11 @@ class PageLoader:
             resource_path)
 
         path_to_save = (
-            self.__path_processor.get_path_to_save_resource(resource_path))
+            self.__path_processor.get_path_to_save_resource(resource_full_url))
         self.__download_resource(resource_full_url, path_to_save)
 
         new_resource_link = (
-            self.__path_processor.get_resource_updated_link(resource_path))
+            self.__path_processor.get_resource_updated_link(resource_full_url))
 
         resource_link_attr = (
             self.__path_processor.get_resource_link_attr(resource))
