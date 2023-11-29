@@ -1,4 +1,4 @@
-# page_loader/path_processor.py
+# page_loader/resource_processor.py
 import os
 import shutil
 from datetime import datetime

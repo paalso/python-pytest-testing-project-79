@@ -1,7 +1,7 @@
 # tests/test_path_processor.py
 import pytest
 from bs4 import BeautifulSoup
-from page_loader.path_processor import ResourceProcessor
+from page_loader.resource_processor import ResourceProcessor
 
 resource_tags = {
     'img': 'src',

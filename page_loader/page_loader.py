@@ -1,7 +1,7 @@
 # page_loader/page_loader.py
 import requests
 from bs4 import BeautifulSoup
-from .path_processor import ResourceProcessor
+from .resource_processor import ResourceProcessor
 
 
 class PageLoader:
