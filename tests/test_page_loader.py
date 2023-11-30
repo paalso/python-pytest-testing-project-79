@@ -10,22 +10,18 @@ from page_loader.page_loader import download
 
 URL = 'https://ru.hexlet.io/courses'
 
-RESOURCE_URLS = {
-    'https://ru.hexlet.io/assets/professions/python.png':
-        'Mocked content for /assets/professions/python.png',
-    'https://ru.hexlet.io/courses/assets/professions/python.jpg':
-        'Mocked content for assets/professions/python.jpg',
-    'https://ru.hexlet.io/courses/assets/professions/python.bmp':
-        'Mocked content for https://ru.hexlet.io/courses/assets/professions/python.bmp',    # noqa: E501
-    'https://ru.hexlet.io/assets/application.css':
-        'https://ru.hexlet.io/courses/assets/application.css',
-}
-
 
 def compare_prettified_htmls(html_content1, html_content2):
     soap1 = BeautifulSoup(html_content1, 'html.parser')
     soap2 = BeautifulSoup(html_content2, 'html.parser')
     return soap1.prettify() == soap2.prettify()
+
+
+@pytest.fixture
+def retrieved_content():
+    path = os.path.join('tests', 'fixtures', 'retrieved.html')
+    with open(path) as f:
+        return f.read()
 
 
 @pytest.fixture
@@ -35,11 +31,18 @@ def expected_content():
         return f.read()
 
 
-@pytest.fixture
-def retrieved_content():
-    path = os.path.join('tests', 'fixtures', 'retrieved.html')
-    with open(path) as f:
-        return f.read()
+RESOURCE_URLS = {
+    'https://ru.hexlet.io/assets/professions/python.png':
+        'Mocked content for /assets/professions/python.png',
+    'https://ru.hexlet.io/courses/assets/professions/python.jpg':
+        'Mocked content for assets/professions/python.jpg',
+    'https://ru.hexlet.io/courses/assets/professions/python.bmp':
+        'Mocked content for https://ru.hexlet.io/courses/assets/professions/python.bmp',  # noqa: E501
+    'https://ru.hexlet.io/assets/application.css':
+        '* {\n  margin: 0;\n  padding: 0;\n}',
+    'https://ru.hexlet.io/courses.html':
+        retrieved_content
+}
 
 
 @pytest.fixture

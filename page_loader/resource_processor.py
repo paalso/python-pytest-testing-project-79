@@ -72,7 +72,11 @@ class ResourceProcessor:
         self.logger.debug(f'Resource URL: {url}')
         return url
 
+    # TODO: maybe refactor using page_loader.url_utils.full_url?
     def __get_resource_full_url(self, resource_path):
+        if not url_utils.extension(resource_path):
+            resource_path = f"{resource_path.rstrip('/')}.html"
+
         if url_utils.domain(resource_path):
             self.logger.debug(f'Resource is an absolute URL: {resource_path}')
             return resource_path
