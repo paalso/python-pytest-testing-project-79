@@ -17,6 +17,8 @@ RESOURCE_URLS = {
         'Mocked content for assets/professions/python.jpg',
     'https://ru.hexlet.io/courses/assets/professions/python.bmp':
         'Mocked content for https://ru.hexlet.io/courses/assets/professions/python.bmp',    # noqa: E501
+    'https://ru.hexlet.io/assets/application.css':
+        'https://ru.hexlet.io/courses/assets/application.css',
 }
 
 
