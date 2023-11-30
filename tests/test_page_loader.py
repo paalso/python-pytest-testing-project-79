@@ -74,6 +74,14 @@ def test_zero_test():
     assert True
 
 
+def test_download_return_value_with_none_path(
+        retrieved_content, cleanup_downloaded_files, setup_mocking):
+    with setup_mocking:
+        result_path = download(URL)
+        assert os.path.isfile(result_path)
+        assert result_path == 'ru-hexlet-io-courses.html'
+
+
 # Test the download of HTML content
 def test_download_html(
         expected_content,

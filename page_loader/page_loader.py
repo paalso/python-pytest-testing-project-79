@@ -14,7 +14,7 @@ class PageLoader:
         'source': 'srcset'
     }
 
-    def __init__(self, url, path=None):
+    def __init__(self, url, path):
         self.__url = url
         self.__soup = BeautifulSoup(
             self.__get_raw_page_content(), 'html.parser')
@@ -61,5 +61,6 @@ class PageLoader:
 
 
 def download(url, path=None):
+    path = path or ''
     page_loader = PageLoader(url, path)
     return page_loader.download()

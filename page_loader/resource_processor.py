@@ -9,7 +9,7 @@ from . import url_utils
 LOGS_DIR = 'logs'
 LOG_FILE_TEMPLATE = 'download_{page_content_filename}_{date_time}.log'
 TIME_FORMAT = '%Y%m%d_%H%M%S'
-os.environ['DEBUG'] = 'true'
+os.environ['DEBUG'] = 'false'
 
 
 class ResourceProcessor:
@@ -32,11 +32,9 @@ class ResourceProcessor:
         self.__resources_path = url_utils.dirname_for_web_resources(
             self.path_to_save_page_content)
 
-        if os.environ.get('DEBUG', '').lower() == 'true':
-            self.__setup_logger()
+        self.__setup_logger()
         self.__log_attributes()
 
-    # TODO: test it!
     def download_resources(self, resources):
         self.__make_resources_dir()
 
@@ -137,9 +135,15 @@ class ResourceProcessor:
 
     def __setup_logger(self):
         log_file_path = self.__get_log_file_path()
+        if os.environ.get('DEBUG', '').lower() == 'true':
+            log_level = logging.DEBUG
+        else:
+            log_level = logging.INFO
+
         logging.basicConfig(filename=log_file_path, level=logging.DEBUG)
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
+        self.logger.debug(f'log_level: {log_level}')
 
     def __get_log_file_path(self):
         log_file_dir = LOGS_DIR
