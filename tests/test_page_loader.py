@@ -1,4 +1,5 @@
 # tests/test_page_loader.py
+import json
 import os
 import requests_mock
 import tempfile
@@ -9,6 +10,10 @@ from bs4 import BeautifulSoup
 from page_loader.page_loader import download
 
 URL = 'https://ru.hexlet.io/courses'
+RESOURCES_DIR = 'ru-hexlet-io-courses_files'
+CONTENT_FILE = 'ru-hexlet-io-courses.html'
+with open(os.path.join('tests', 'fixtures', 'resources.json')) as f:
+    RESOURCES = json.load(f)
 
 
 def compare_prettified_htmls(html_content1, html_content2):
@@ -31,20 +36,6 @@ def expected_content():
         return f.read()
 
 
-RESOURCE_URLS = {
-    'https://ru.hexlet.io/assets/professions/python.png':
-        'Mocked content for /assets/professions/python.png',
-    'https://ru.hexlet.io/courses/assets/professions/python.jpg':
-        'Mocked content for assets/professions/python.jpg',
-    'https://ru.hexlet.io/courses/assets/professions/python.bmp':
-        'Mocked content for https://ru.hexlet.io/courses/assets/professions/python.bmp',  # noqa: E501
-    'https://ru.hexlet.io/assets/application.css':
-        '* {\n  margin: 0;\n  padding: 0;\n}',
-    'https://ru.hexlet.io/courses.html':
-        retrieved_content
-}
-
-
 @pytest.fixture
 def cleanup_downloaded_files():
     yield
@@ -61,8 +52,11 @@ def cleanup_downloaded_files():
 def setup_mocking(retrieved_content):
     with requests_mock.Mocker() as m:
         m.get(URL, text=retrieved_content)
-        for resource_url, resource_text in RESOURCE_URLS.items():
-            m.get(resource_url, text='Mocked content for resource')
+        m.get(RESOURCES[-1]['url'], text=retrieved_content)  # href="/courses"
+        for resource_data in RESOURCES:
+            if resource_data['url'].endswith('html'):
+                resource_data['content'] = retrieved_content
+            m.get(resource_data['url'], text=resource_data['content'])
         return m
 
 
@@ -93,7 +87,7 @@ def test_download_html(
             "Downloaded HTML file should exist"
 
         html_path = os.path.join(
-            subdir_path, 'ru-hexlet-io-courses.html'
+            subdir_path, CONTENT_FILE
         )
         assert result_path == html_path, \
             "Downloaded HTML file path should match the expected path"
@@ -103,40 +97,42 @@ def test_download_html(
 
 
 # Test the download of resources (images) and ensure proper link transformation
-def test_download_images(
+def test_download_resources(
         expected_content, retrieved_content, setup_mocking, temp_directory):
     subdir_path = temp_directory
     with (setup_mocking):
         download(URL, path=subdir_path)
         resources_dir_path = os.path.join(
-            subdir_path, 'ru-hexlet-io-courses_files'
+            subdir_path, RESOURCES_DIR
         )
         assert os.path.exists(resources_dir_path)
         assert os.path.isdir(resources_dir_path)
 
         html_path = os.path.join(
-            subdir_path, 'ru-hexlet-io-courses.html'
+            subdir_path, CONTENT_FILE
         )
         with open(html_path, 'r') as file:
             html_content = file.read()
 
-        image_links_and_paths = [
-            ('ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-python.png',  # noqa: E501
-             'ru-hexlet-io-assets-professions-python.png'),
-            ('ru-hexlet-io-courses_files/ru-hexlet-io-courses-assets-professions-python.jpg',  # noqa: E501
-             'ru-hexlet-io-courses-assets-professions-python.jpg'),
-            ('ru-hexlet-io-courses_files/ru-hexlet-io-courses-assets-professions-python.bmp',  # noqa: E501
-             'ru-hexlet-io-courses-assets-professions-python.bmp')
-        ]
-
-        for link, path in image_links_and_paths:
+        for resource_data in RESOURCES:
+            path = resource_data['path']
+            link = os.path.join(RESOURCES_DIR, path)
             assert link in html_content
-            assert os.path.isfile(os.path.join(resources_dir_path, path))
+
+            resource_path = os.path.join(resources_dir_path, path)
+            assert os.path.isfile(resource_path)
+
+            content = resource_data['content']
+
+            if resource_data['url'].endswith('html'):
+                assert compare_prettified_htmls(
+                    open(resource_path).read(), content)
+            else:
+                assert open(resource_path).read() == content
 
         # Check that images from external links are not saved
-        external_image_files = [
+        external_resource_files = [
             file for file in os.listdir(resources_dir_path)
-            if "external-image.png" in file
+            if "external-" in file
         ]
-
-        assert not external_image_files
+        assert not external_resource_files
