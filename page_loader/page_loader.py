@@ -2,6 +2,7 @@
 import requests
 from bs4 import BeautifulSoup
 from .resource_processor import ResourceProcessor
+from .logger import Logger
 
 
 class PageLoader:
@@ -29,7 +30,11 @@ class PageLoader:
             self.__ignore_other_hosts
         )
 
+        self.__logger = Logger(self.__resource_processor.page_content_filename)
+
     def download(self):
+        self.__logger.info(f"Start download from '{self.__url}'")
+
         self.__download_resources()
         self.__download_page()
         return self.__resource_processor.path_to_save_page_content
@@ -45,6 +50,10 @@ class PageLoader:
 
         with open(path_to_save_page_content, 'w') as f:
             f.write(processed_page_content)
+
+        self.__logger.info(
+            f"page content from '{self.__url}' downloaded successfully"
+            f"and saved to '{path_to_save_page_content}'")
 
     def __download_resources(self):
         resources = self.__get_page_resources()

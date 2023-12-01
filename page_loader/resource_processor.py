@@ -17,16 +17,16 @@ class ResourceProcessor:
         self.__domain = url_utils.domain(url)
         self.__resources_dir = url_utils.dirname_for_web_resources(
             url_utils.filename_from_url(self.__url))
-        self.__page_content_filename = url_utils.filename_from_url(self.__url)
+        self.page_content_filename = url_utils.filename_from_url(self.__url)
         self.__ignore_other_hosts = ignore_other_hosts
 
         self.path_to_save_page_content = os.path.join(
-            path, self.__page_content_filename)
+            path, self.page_content_filename)
 
         self.__resources_path = url_utils.dirname_for_web_resources(
             self.path_to_save_page_content)
 
-        self.__logger = Logger(self.__page_content_filename)
+        self.__logger = Logger(self.page_content_filename)
         self.__log_attributes()
 
     def download_resources(self, resources):
@@ -136,7 +136,7 @@ class ResourceProcessor:
         self.__logger.debug(f'__full_domain: {self.__full_domain}')
         self.__logger.debug(f'__resources_dir: {self.__resources_dir}')
         self.__logger.debug(
-            f'__page_content_filename: {self.__page_content_filename}')
+            f'__page_content_filename: {self.page_content_filename}')
         self.__logger.debug(
             f'path_to_save_page_content: {self.path_to_save_page_content}')
         self.__logger.debug(f'self.resources_path: {self.__resources_path}')
