@@ -1,15 +1,9 @@
 # page_loader/resource_processor.py
 import os
 import shutil
-from datetime import datetime
-import logging
 import requests
 from . import url_utils
-
-LOGS_DIR = 'logs'
-LOG_FILE_TEMPLATE = 'download_{page_content_filename}_{date_time}.log'
-TIME_FORMAT = '%Y%m%d_%H%M%S'
-os.environ['DEBUG'] = 'false'
+from .logger import Logger
 
 
 class ResourceProcessor:
@@ -32,7 +26,7 @@ class ResourceProcessor:
         self.__resources_path = url_utils.dirname_for_web_resources(
             self.path_to_save_page_content)
 
-        self.__setup_logger()
+        self.logger = Logger(self.__page_content_filename)
         self.__log_attributes()
 
     def download_resources(self, resources):
@@ -132,28 +126,6 @@ class ResourceProcessor:
             self.logger.info(
                 f'Failed to download resource.'
                 f'Status code: {response.status_code}')
-
-    def __setup_logger(self):
-        log_file_path = self.__get_log_file_path()
-        if os.environ.get('DEBUG', '').lower() == 'true':
-            log_level = logging.DEBUG
-        else:
-            log_level = logging.INFO
-
-        logging.basicConfig(filename=log_file_path, level=logging.DEBUG)
-        self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(logging.StreamHandler())
-        self.logger.debug(f'log_level: {log_level}')
-
-    def __get_log_file_path(self):
-        log_file_dir = LOGS_DIR
-        page_content_filename = self.__page_content_filename.rstrip('.html')
-        date_time = datetime.now().strftime(TIME_FORMAT)
-        log_file_name = LOG_FILE_TEMPLATE.format(
-            page_content_filename=page_content_filename,
-            date_time=date_time)
-
-        return os.path.join(log_file_dir, log_file_name)
 
     def __log_attributes(self):
         self.logger.debug(f'{self.__class__.__name__} initialized')
