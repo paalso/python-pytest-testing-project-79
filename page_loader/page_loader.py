@@ -42,6 +42,7 @@ class PageLoader:
 
         path_to_save_page_content = (
             self.__resource_processor.path_to_save_page_content)
+
         with open(path_to_save_page_content, 'w') as f:
             f.write(processed_page_content)
 
