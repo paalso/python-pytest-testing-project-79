@@ -10,14 +10,12 @@ DEBUG_ENV_VARIABLE = 'DEBUG'
 
 
 class Logger:
-    def __init__(self, page_content_filename, log_level=logging.DEBUG):
+    def __init__(self, page_content_filename, log_level=logging.INFO):
         self.__page_content_filename = page_content_filename
         self.log_level = log_level
 
-        logging.basicConfig(filename=self._get_log_file_path(),
-                            level=log_level)
         self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(logging.StreamHandler())
+        self.__configure_logger()
         self.logger.debug(f'log_level: {log_level}')
 
     def debug(self, message):
@@ -29,7 +27,22 @@ class Logger:
     def is_debug_enabled(self):
         return os.environ.get(DEBUG_ENV_VARIABLE, '').lower() == 'true'
 
-    def _get_log_file_path(self):
+    def __configure_logger(self):
+        log_file_path = self.__get_log_file_path()
+
+        file_handler = logging.FileHandler(log_file_path)
+        console_handler = logging.StreamHandler()
+
+        if self.log_level < logging.INFO:
+            self.logger.addHandler(file_handler)
+            self.logger.addHandler(console_handler)
+
+        elif self.log_level == logging.INFO:
+            self.logger.addHandler(console_handler)
+
+        self.logger.setLevel(self.log_level)
+
+    def __get_log_file_path(self):
         log_file_dir = LOGS_DIR
         formatted_page_content_filename = (
             self.__page_content_filename.rstrip('.html'))
