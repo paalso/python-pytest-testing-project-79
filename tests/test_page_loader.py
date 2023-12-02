@@ -7,7 +7,7 @@ import pytest
 import shutil
 from bs4 import BeautifulSoup
 
-from page_loader.page_loader import download
+from page_loader import download
 
 URL = 'https://ru.hexlet.io/courses'
 RESOURCES_DIR = 'ru-hexlet-io-courses_files'

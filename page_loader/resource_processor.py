@@ -7,10 +7,11 @@ from .logger import Logger
 
 
 class ResourceProcessor:
-    def __init__(self, url, resource_tags,
+    def __init__(self, url, resource_tags, soup,
                  path=None, ignore_other_hosts=True):
         self.__path = path or ''
         self.__url = url
+        self.__soup = soup
         self.__resource_tags = resource_tags
         self.__full_domain = url_utils.full_domain(url)
         self.__base_url = url_utils.base_url(url)
@@ -29,7 +30,12 @@ class ResourceProcessor:
         self.__logger = Logger(self.page_content_filename)
         self.__log_attributes()
 
-    def download_resources(self, resources):
+    def download_resources(self):
+        resources = self.__get_page_resources()
+
+        if not resources:
+            return
+
         self.__make_resources_dir()
 
         processed_resources_results = [
@@ -40,6 +46,10 @@ class ResourceProcessor:
 
         if not processed_resources_exist:
             self.__remove_resources_dir()
+
+    def __get_page_resources(self):
+        return [resource for tag in self.__resource_tags
+                for resource in self.__soup.find_all(tag)]
 
     def __process_resource(self, resource):
         resource_path = self.__get_resource_url(resource)

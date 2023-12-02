@@ -1,5 +1,5 @@
 import argparse
-from page_loader.page_loader import download
+from page_loader.download_manager import download
 
 
 def parse_args():
