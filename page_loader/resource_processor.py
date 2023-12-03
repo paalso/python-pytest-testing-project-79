@@ -128,7 +128,7 @@ class ResourceProcessor:
                 f"resource file '{url}' downloaded successfully"
                 f"and saved to '{save_path}'")
         else:
-            self.__logger.info(
+            self.__logger.error(
                 f'Failed to download resource.'
                 f'Status code: {response.status_code}')
 

@@ -22,6 +22,9 @@ class Logger:
     def info(self, message):
         self.__logger.info(message)
 
+    def error(self, message):
+        self.__logger.error(message)
+
     def __configure_logger(self):
         self.__logger.setLevel(self.__log_level)
 
@@ -48,7 +51,7 @@ class Logger:
     @staticmethod
     def __get_level():
         load_dotenv()
-        log_level = os.environ.get('LOG_LEVEL')
+        log_level = os.environ.get('LOG_LEVEL', 'INFO')
         return getattr(logging, log_level.upper(), logging.DEBUG)
 
     def __add_file_handler(self):
