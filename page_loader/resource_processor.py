@@ -97,7 +97,7 @@ class ResourceProcessor:
             f'Removed empty resources directory: {self.__resources_path}')
 
     # TODO: Refactoring is needed again
-    # Move a resource processing logic to a separate class
+    # TODO: Move a resource processing logic to a separate class
     def __get_resource_updated_link(self, resource_full_url):
         base_path_to_save = url_utils.filename_from_full_url(resource_full_url)
         updated_link = os.path.join(self.__resources_dir, base_path_to_save)
