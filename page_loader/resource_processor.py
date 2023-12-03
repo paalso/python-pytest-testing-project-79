@@ -3,32 +3,22 @@ import os
 import shutil
 import requests
 from . import url_utils
-from .logger import Logger
 
 
 class ResourceProcessor:
-    def __init__(self, url, resource_tags, soup,
-                 path=None, ignore_other_hosts=True):
-        self.__path = path or ''
-        self.__url = url
-        self.__soup = soup
-        self.__resource_tags = resource_tags
-        self.__full_domain = url_utils.full_domain(url)
-        self.__base_url = url_utils.base_url(url)
-        self.__domain = url_utils.domain(url)
+    def __init__(self, download_manager):
+        self.__download_manager = download_manager
+        self.__full_domain = url_utils.full_domain(self.__download_manager.url)
+        self.__base_url = url_utils.base_url(self.__download_manager.url)
+        self.__domain = url_utils.domain(self.__download_manager.url)
         self.__resources_dir = url_utils.dirname_for_web_resources(
-            url_utils.filename_from_url(self.__url))
-        self.page_content_filename = url_utils.filename_from_url(self.__url)
-        self.__ignore_other_hosts = ignore_other_hosts
-
-        self.path_to_save_page_content = os.path.join(
-            path, self.page_content_filename)
+            url_utils.filename_from_url(self.__download_manager.url))
 
         self.__resources_path = url_utils.dirname_for_web_resources(
-            self.path_to_save_page_content)
+            self.__download_manager.path_to_save_page_content)
 
-        self.__logger = Logger(self.page_content_filename)
-        self.__log_attributes()
+        self.__logger = self.__download_manager.logger
+        # self.__log_attributes()
 
     def download_resources(self):
         resources = self.__get_page_resources()
@@ -48,25 +38,29 @@ class ResourceProcessor:
             self.__remove_resources_dir()
 
     def __get_page_resources(self):
-        return [resource for tag in self.__resource_tags
-                for resource in self.__soup.find_all(tag)]
+        return [resource for tag in self.__download_manager.resource_tags
+                for resource in self.__download_manager.soup.find_all(tag)]
 
     def __process_resource(self, resource):
-        resource_path = self.__get_resource_url(resource)
+        resource_url = self.__get_resource_url(resource)
 
-        if self.__ignore_other_hosts and self.__is_other_domain(resource_path):
+        if self.__should_ignore_host(resource_url):
             return False
 
-        resource_full_url = self.__get_resource_full_url(resource_path)
-
+        resource_full_url = self.__get_full_url(resource_url)
         path_to_save = self.__get_path_to_save_resource(resource_full_url)
         self.__download_resource(resource_full_url, path_to_save)
+        self.__update_resource_link(resource, resource_full_url)
+        return True
 
+    def __should_ignore_host(self, resource_path):
+        return self.__download_manager.ignore_other_hosts and \
+            self.__is_other_domain(resource_path)
+
+    def __update_resource_link(self, resource, resource_full_url):
         new_resource_link = self.__get_resource_updated_link(resource_full_url)
         resource_link_attr = self.__get_resource_link_attr(resource)
         resource[resource_link_attr] = new_resource_link
-
-        return True
 
     def __get_resource_url(self, resource):
         resource_link_attr = self.__get_resource_link_attr(resource)
@@ -75,7 +69,7 @@ class ResourceProcessor:
         return url
 
     # TODO: maybe refactor using page_loader.url_utils.full_url?
-    def __get_resource_full_url(self, resource_path):
+    def __get_full_url(self, resource_path):
         if not url_utils.extension(resource_path):
             resource_path = f"{resource_path.rstrip('/')}.html"
 
@@ -112,13 +106,14 @@ class ResourceProcessor:
 
     def __get_path_to_save_resource(self, resource_full_url):
         resource_new_link = self.__get_resource_updated_link(resource_full_url)
-        path_to_save = os.path.join(self.__path, resource_new_link)
+        path_to_save = os.path.join(
+            self.__download_manager.path, resource_new_link)
         self.__logger.debug(f'Path to save resource: {path_to_save}')
         return path_to_save
 
     def __get_resource_link_attr(self, resource):
         resource_name = resource.name
-        return self.__resource_tags[resource_name]
+        return self.__download_manager.resource_tags[resource_name]
 
     def __is_other_domain(self, resource_url):
         resource_domain = url_utils.domain(resource_url)
@@ -139,14 +134,16 @@ class ResourceProcessor:
 
     def __log_attributes(self):
         self.__logger.debug(f'{self.__class__.__name__} initialized')
-        self.__logger.debug(f'__path: {self.__path}')
-        self.__logger.debug(f'__url: {self.__url}')
+        self.__logger.debug(f'__path: {self.__download_manager.path}')
+        self.__logger.debug(f'__url: {self.__download_manager.url}')
         self.__logger.debug(f'__base_url: {self.__base_url}')
         self.__logger.debug(f'__domain: {self.__domain}')
         self.__logger.debug(f'__full_domain: {self.__full_domain}')
         self.__logger.debug(f'__resources_dir: {self.__resources_dir}')
         self.__logger.debug(
-            f'__page_content_filename: {self.page_content_filename}')
+            f'__page_content_filename: '
+            f'{self.__download_manager.page_content_filename}')
         self.__logger.debug(
-            f'path_to_save_page_content: {self.path_to_save_page_content}')
+            f'path_to_save_page_content: '
+            f'{self.__download_manager.path_to_save_page_content}')
         self.__logger.debug(f'self.resources_path: {self.__resources_path}')
