@@ -125,7 +125,7 @@ class ResourceProcessor:
             with open(save_path, 'wb') as f:
                 f.write(response.content)
             self.__logger.info(
-                f"resource file '{url}' downloaded successfully"
+                f"resource file '{url}' downloaded successfully "
                 f"and saved to '{save_path}'")
         else:
             self.__logger.error(

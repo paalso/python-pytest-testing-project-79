@@ -6,6 +6,7 @@ import tempfile
 import pytest
 import shutil
 from bs4 import BeautifulSoup
+import logging
 
 from page_loader import download
 
@@ -150,3 +151,16 @@ def test_download_return_value_with_none_path(
             f"Downloaded file {result_path} should exist"
         assert result_path == 'ru-hexlet-io-courses.html', \
             f'Downloaded file path should be {CONTENT_FILE}'
+
+
+@pytest.mark.parametrize('filename', ['retrieved.html'])
+def test_download_logging(
+        retrieved_content, setup_mocking, temp_directory, caplog):
+    caplog.set_level(level=logging.INFO)
+    with setup_mocking, temp_directory as temp_dir:
+        download(URL, path=temp_dir)
+        log_messages = [record.message for record in caplog.records]
+        with open(os.path.join('tests', 'fixtures', 'log_content.txt')) as f:
+            for line in f:
+                log_line = line.rstrip().replace('dir_to_save', temp_dir)
+                assert log_line in log_messages
