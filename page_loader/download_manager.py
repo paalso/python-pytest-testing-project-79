@@ -23,6 +23,7 @@ class DownloadManager:
         self.path_to_save_page_content = os.path.join(
             path, self.page_content_filename)
         self.logger = Logger(self.page_content_filename)
+        self.__log_attributes()
 
         self.__resource_processor = ResourceProcessor(self)
         self.__get_settings()
@@ -60,3 +61,12 @@ class DownloadManager:
         self.resource_tags = self.__settings['resource_tags']
         self.ignore_other_hosts = self.__settings['ignore_other_hosts']
         self.__prettify = self.__settings['prettify']
+
+    def __log_attributes(self):
+        self.logger.debug(f'{self.__class__.__name__} initialized')
+        self.logger.debug(f'Log level: {self.logger.log_level}')
+        self.logger.debug(f'Log path: {self.logger.log_path}')
+        self.logger.debug(f'page_content_filename:'
+                          f'{self.page_content_filename}')
+        self.logger.debug(f'path_to_save_page_content:'
+                          f'{self.path_to_save_page_content}')

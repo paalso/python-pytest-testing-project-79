@@ -18,7 +18,7 @@ class ResourceProcessor:
             self.__download_manager.path_to_save_page_content)
 
         self.__logger = self.__download_manager.logger
-        # self.__log_attributes()
+        self.__log_attributes()
 
     def download_resources(self):
         resources = self.__get_page_resources()
@@ -134,16 +134,8 @@ class ResourceProcessor:
 
     def __log_attributes(self):
         self.__logger.debug(f'{self.__class__.__name__} initialized')
-        self.__logger.debug(f'__path: {self.__download_manager.path}')
-        self.__logger.debug(f'__url: {self.__download_manager.url}')
-        self.__logger.debug(f'__base_url: {self.__base_url}')
-        self.__logger.debug(f'__domain: {self.__domain}')
-        self.__logger.debug(f'__full_domain: {self.__full_domain}')
-        self.__logger.debug(f'__resources_dir: {self.__resources_dir}')
-        self.__logger.debug(
-            f'__page_content_filename: '
-            f'{self.__download_manager.page_content_filename}')
-        self.__logger.debug(
-            f'path_to_save_page_content: '
-            f'{self.__download_manager.path_to_save_page_content}')
-        self.__logger.debug(f'self.resources_path: {self.__resources_path}')
+        self.__logger.debug(f'domain: {self.__domain}')
+        self.__logger.debug(f'base_url: {self.__base_url}')
+        self.__logger.debug(f'full_domain: {self.__full_domain}')
+        self.__logger.debug(f'resources_dir: {self.__resources_dir}')
+        self.__logger.debug(f'resources_path: {self.__resources_path}')
