@@ -49,7 +49,7 @@ class DownloadManager:
             f.write(content)
 
         self.logger.info(
-            f"page content from '{self.url}' downloaded successfully "
+            f"Page content from '{self.url}' downloaded successfully "
             f"and saved to '{self.path_to_save_page_content}'")
 
     def __get_soup(self):

@@ -6,4 +6,4 @@ resource file 'https://ru.hexlet.io/assets/application.css' downloaded successfu
 resource file 'https://ru.hexlet.io/courses.html' downloaded successfully and saved to 'dir_to_save/ru-hexlet-io-courses_files/ru-hexlet-io-courses.html'
 resource file 'https://ru.hexlet.io/packs/js/runtime.js' downloaded successfully and saved to 'dir_to_save/ru-hexlet-io-courses_files/ru-hexlet-io-packs-js-runtime.js'
 resource file 'https://ru.hexlet.io/packs/js/script.js' downloaded successfully and saved to 'dir_to_save/ru-hexlet-io-courses_files/ru-hexlet-io-packs-js-script.js'
-page content from 'https://ru.hexlet.io/courses' downloaded successfully and saved to 'dir_to_save/ru-hexlet-io-courses.html'
+Page content from 'https://ru.hexlet.io/courses' downloaded successfully and saved to 'dir_to_save/ru-hexlet-io-courses.html'

@@ -23,10 +23,8 @@ class ResourceProcessor:
     def download_resources(self):
         resources = self.__get_page_resources()
 
-        if not resources:
+        if not resources or not self.__make_resources_dir():
             return
-
-        self.__make_resources_dir()
 
         processed_resources_results = [
             self.__process_resource(resource)
@@ -86,10 +84,18 @@ class ResourceProcessor:
         self.__logger.debug(f'Full URL for relative path: {full_url}')
         return full_url
 
+    # TODO: test it
     def __make_resources_dir(self):
-        os.makedirs(self.__resources_path)
-        self.__logger.debug(
-            f'Created resources directory: {self.__resources_path}')
+        try:
+            os.makedirs(self.__resources_path)
+            self.__logger.debug(
+                f'Created resources directory: {self.__resources_path}')
+            return True
+
+        except OSError as e:
+            self.__logger.error(f'Failed to create resources directory: '
+                                f'{self.__resources_path}. Error {e}')
+            return False
 
     def __remove_resources_dir(self):
         shutil.rmtree(self.__resources_path)
