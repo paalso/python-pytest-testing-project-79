@@ -16,20 +16,22 @@ class DownloadManager:
         self.url = url
         self.path = path or ''
 
-        self.soup = BeautifulSoup(
-            self.__get_raw_page_content(), 'html.parser')
-
         self.page_content_filename = url_utils.filename_from_url(self.url)
         self.path_to_save_page_content = os.path.join(
             path, self.page_content_filename)
         self.logger = Logger(self.page_content_filename)
+
+        self.soup = self.__get_soup()
+
         self.__log_attributes()
 
-        self.__resource_processor = ResourceProcessor(self)
-        self.__get_settings()
+        if self.soup:
+            self.__resource_processor = ResourceProcessor(self)
+            self.__get_settings()
 
     def download(self):
-        self.logger.info(f"Start download from '{self.url}'")
+        if not self.soup:
+            return
 
         self.__resource_processor.download_resources()
         self.__download_page()
@@ -50,9 +52,20 @@ class DownloadManager:
             f"page content from '{self.url}' downloaded successfully "
             f"and saved to '{self.path_to_save_page_content}'")
 
-    def __get_raw_page_content(self):
-        request = requests.get(self.url)
-        return request.text
+    def __get_soup(self):
+        self.logger.info(f"Start download from '{self.url}'")
+        try:
+            response = requests.get(self.url)
+            if response.ok:
+                return BeautifulSoup(response.text, 'html.parser')
+
+            self.logger.error(f"Failed to retrieve content. Server returned "
+                              f"status code {response.status_code}")
+
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Failed to retrieve content. Error: {e}")
+
+        return
 
     def __get_settings(self):
         with open(SETTINGS, 'r') as settings_file:

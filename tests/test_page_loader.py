@@ -1,6 +1,7 @@
 # tests/test_page_loader.py
 import json
 import os
+import requests
 import requests_mock
 import tempfile
 import pytest
@@ -48,6 +49,11 @@ def cleanup_downloaded_files():
 
 
 @pytest.fixture
+def request_status_code(code=200):
+    return code
+
+
+@pytest.fixture
 def setup_mocking(retrieved_content):
     with requests_mock.Mocker() as m:
         m.get(URL, text=retrieved_content)
@@ -60,9 +66,24 @@ def setup_mocking(retrieved_content):
 
 
 @pytest.fixture
+def setup_mocking_404():
+    with requests_mock.Mocker() as m:
+        m.get(URL, status_code=404)
+        return m
+
+
+@pytest.fixture
 def temp_directory():
     temp_dir = tempfile.TemporaryDirectory()
     yield temp_dir
+
+
+@pytest.fixture
+def setup_mocking_request_exception():
+    with requests_mock.Mocker() as m:
+        m.get(URL, exc=requests.exceptions.RequestException(
+            'Failed to retrieve content. Error: Simulated RequestException'))
+        return m
 
 
 # Test the download of HTML content
@@ -164,3 +185,30 @@ def test_download_logging(
             for line in f:
                 log_line = line.rstrip().replace('dir_to_save', temp_dir)
                 assert log_line in log_messages
+
+
+def test_download_html_with_404_status_code(
+        setup_mocking_404, temp_directory, caplog):
+    with (setup_mocking_404, temp_directory as temp_dir):
+        expected_error_message = ('Failed to retrieve content. '
+                                  'Server returned status code 404')
+        result_path = download(URL, path=temp_dir)
+        assert result_path is None, 'Downloaded file should be None'
+        assert expected_error_message in caplog.text, \
+            'Expected error message found in logs'
+        assert not any(os.listdir(temp_dir))
+
+
+def test_handle_request_exception(
+        setup_mocking_request_exception, temp_directory, caplog):
+    with (setup_mocking_request_exception, temp_directory as temp_dir):
+        result_path = download(URL, path=temp_dir)
+
+        assert result_path is None, 'Downloaded file should be None'
+
+        expected_error_message = ('Failed to retrieve content. '
+                                  'Error: Simulated RequestException')
+        assert expected_error_message in caplog.text, \
+            'Expected error message found in logs.'
+
+        assert not any(os.listdir(temp_dir)), "Temp directory should be empty"
