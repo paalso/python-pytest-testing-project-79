@@ -119,18 +119,23 @@ class ResourceProcessor:
         resource_domain = url_utils.domain(resource_url)
         return resource_domain != '' and resource_domain != self.__domain
 
+    # TODO: test it
     def __download_resource(self, url, save_path):
-        response = requests.get(url)
-        if response.ok:
-            with open(save_path, 'wb') as f:
-                f.write(response.content)
-            self.__logger.info(
-                f"resource file '{url}' downloaded successfully "
-                f"and saved to '{save_path}'")
-        else:
-            self.__logger.error(
-                f'Failed to download resource.'
-                f'Status code: {response.status_code}')
+        try:
+            response = requests.get(url)
+            if response.ok:
+                with open(save_path, 'wb') as f:
+                    f.write(response.content)
+                self.__logger.info(
+                    f"resource file '{url}' downloaded successfully "
+                    f"and saved to '{save_path}'")
+            else:
+                self.__logger.error(
+                    f"Failed to download resource file '{url}'"
+                    f'Status code: {response.status_code}')
+        except requests.exceptions.RequestException as e:
+            self.__logger.error(f"Failed to download resource file '{url}'. "
+                                f"Error: {e}")
 
     def __log_attributes(self):
         self.__logger.debug(f'{self.__class__.__name__} initialized')
