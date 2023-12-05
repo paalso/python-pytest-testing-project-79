@@ -4,6 +4,7 @@
 import os
 import pytest
 import logging
+from unittest.mock import patch, Mock
 
 from page_loader import download
 
@@ -150,3 +151,35 @@ def test_handle_request_exception(
             'Expected error message found in logs.'
 
         assert not any(os.listdir(temp_dir)), "Temp directory should be empty"
+
+
+@pytest.mark.parametrize('filename', ['retrieved.html'])
+def test_make_resources_dir_with_creating_resource_path_error(
+        retrieved_content, setup_mocking, temp_directory, caplog):
+
+    with setup_mocking, temp_directory as temp_dir:
+        with patch('os.makedirs') as mock_makedirs:
+            mock_makedirs.side_effect = OSError('Some error happened')
+            result_path = download(URL, path=temp_dir)
+
+            expected_error_message = (
+                'Failed to create resources directory: '
+                f'{temp_dir}/ru-hexlet-io-courses_files. '
+                'Error: Some error happened')
+            assert expected_error_message in caplog.text, \
+                'Expected error message found in logs.'
+
+            resources_dir_path = os.path.join(temp_dir, RESOURCES_DIR)
+            assert not os.path.exists(resources_dir_path), \
+                f"The resources directory '{RESOURCES_DIR}' should not exist"
+
+            expected_content_source = os.path.join(
+                'tests', 'fixtures', 'expected_without_updated_links.html')
+
+            with open(result_path, 'r') as f_result, \
+                 open(expected_content_source) as f_expected:
+                expected_content = f_expected.read()
+                result_content = f_result.read()
+                assert compare_prettified_htmls(expected_content,
+                                                result_content), \
+                    "Downloaded HTML content should match the expected content"

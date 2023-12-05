@@ -94,7 +94,7 @@ class ResourceProcessor:
 
         except OSError as e:
             self.__logger.error(f'Failed to create resources directory: '
-                                f'{self.__resources_path}. Error {e}')
+                                f'{self.__resources_path}. Error: {e}')
             return False
 
     def __remove_resources_dir(self):
