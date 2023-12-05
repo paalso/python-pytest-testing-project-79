@@ -1,89 +1,27 @@
 # tests/test_page_loader.py
-import json
+# flake8: noqa: F401, F811
+
 import os
-import requests
-import requests_mock
-import tempfile
 import pytest
-import shutil
-from bs4 import BeautifulSoup
 import logging
 
 from page_loader import download
 
-URL = 'https://ru.hexlet.io/courses'
-RESOURCES_DIR = 'ru-hexlet-io-courses_files'
-CONTENT_FILE = 'ru-hexlet-io-courses.html'
-with open(os.path.join('tests', 'fixtures', 'resources.json')) as f:
-    RESOURCES = json.load(f)
 
-
-def compare_prettified_htmls(html_content1, html_content2):
-    soap1 = BeautifulSoup(html_content1, 'html.parser')
-    soap2 = BeautifulSoup(html_content2, 'html.parser')
-    return soap1.prettify() == soap2.prettify()
-
-
-@pytest.fixture
-def retrieved_content(filename):
-    path = os.path.join('tests', 'fixtures', filename)
-    with open(path) as f:
-        return f.read()
-
-
-@pytest.fixture
-def expected_content():
-    path = os.path.join('tests', 'fixtures', 'expected.html')
-    with open(path) as f:
-        return f.read()
-
-
-@pytest.fixture
-def cleanup_downloaded_files():
-    yield
-
-    if os.path.isfile(CONTENT_FILE):
-        os.remove(CONTENT_FILE)
-    if os.path.isdir(RESOURCES_DIR):
-        shutil.rmtree(RESOURCES_DIR)
-
-
-@pytest.fixture
-def request_status_code(code=200):
-    return code
-
-
-@pytest.fixture
-def setup_mocking(retrieved_content):
-    with requests_mock.Mocker() as m:
-        m.get(URL, text=retrieved_content)
-        m.get(RESOURCES[-1]['url'], text=retrieved_content)  # href="/courses"
-        for resource_data in RESOURCES:
-            if resource_data['url'].endswith('html'):
-                resource_data['content'] = retrieved_content
-            m.get(resource_data['url'], text=resource_data['content'])
-        return m
-
-
-@pytest.fixture
-def setup_mocking_404():
-    with requests_mock.Mocker() as m:
-        m.get(URL, status_code=404)
-        return m
-
-
-@pytest.fixture
-def temp_directory():
-    temp_dir = tempfile.TemporaryDirectory()
-    yield temp_dir
-
-
-@pytest.fixture
-def setup_mocking_request_exception():
-    with requests_mock.Mocker() as m:
-        m.get(URL, exc=requests.exceptions.RequestException(
-            'Failed to retrieve content. Error: Simulated RequestException'))
-        return m
+from fixtures.fixtures import (
+    URL,
+    RESOURCES_DIR,
+    CONTENT_FILE,
+    RESOURCES,
+    compare_prettified_htmls,
+    retrieved_content,
+    expected_content,
+    cleanup_downloaded_files,
+    setup_mocking,
+    setup_mocking_404,
+    setup_mocking_request_exception,
+    temp_directory
+)
 
 
 # Test the download of HTML content
