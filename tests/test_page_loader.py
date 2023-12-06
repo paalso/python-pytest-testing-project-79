@@ -1,10 +1,9 @@
-# tests/test_page_loader.py
 # flake8: noqa: F401, F811
 
 import os
 import pytest
 import logging
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 
 from page_loader import download
 
@@ -31,7 +30,6 @@ from fixtures.fixtures import (
 def test_download_html(
         expected_content, retrieved_content, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
-        pass
         result_path = download(URL, path=temp_dir)
 
         assert os.path.isfile(result_path), "Downloaded HTML file should exist"

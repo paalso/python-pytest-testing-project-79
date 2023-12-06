@@ -1,4 +1,3 @@
-# page_loader/logger.py
 from datetime import datetime
 import logging
 from dotenv import load_dotenv

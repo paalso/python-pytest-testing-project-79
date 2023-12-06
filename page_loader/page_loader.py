@@ -1,5 +1,3 @@
-# page_loader/page_loader.py
-
 from .download_manager import DownloadManager
 
 

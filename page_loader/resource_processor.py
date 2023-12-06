@@ -1,4 +1,3 @@
-# page_loader/resource_processor.py
 import os
 import shutil
 import requests

@@ -1,4 +1,3 @@
-# page_loader/download_manager.py
 import json
 import os
 import requests

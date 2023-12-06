@@ -1,4 +1,3 @@
-# tests/fixtures/fixtures.py
 import json
 import os
 import requests
