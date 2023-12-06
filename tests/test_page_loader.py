@@ -4,7 +4,7 @@
 import os
 import pytest
 import logging
-from unittest.mock import patch, Mock
+from unittest.mock import patch, mock_open
 
 from page_loader import download
 
@@ -160,6 +160,7 @@ def test_make_resources_dir_with_creating_resource_path_error(
     with setup_mocking, temp_directory as temp_dir:
         with patch('os.makedirs') as mock_makedirs:
             mock_makedirs.side_effect = OSError('Some error happened')
+            # breakpoint()
             result_path = download(URL, path=temp_dir)
 
             expected_error_message = (

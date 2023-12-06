@@ -34,23 +34,30 @@ class DownloadManager:
             return
 
         self.__resource_processor.download_resources()
-        self.__download_page()
-        return self.path_to_save_page_content
+        if self.__download_page():
+            return self.path_to_save_page_content
 
     def __download_page(self):
         processed_page_content = self.__process_page_content()
-        self.__save_page_content(processed_page_content)
+        return self.__save_page_content(processed_page_content)
 
     def __process_page_content(self):
         return self.soup.prettify() if self.__prettify else str(self.soup)
 
     def __save_page_content(self, content):
-        with open(self.path_to_save_page_content, 'w') as f:
-            f.write(content)
-
-        self.logger.info(
-            f"Page content from '{self.url}' downloaded successfully "
-            f"and saved to '{self.path_to_save_page_content}'")
+        try:
+            with open(self.path_to_save_page_content, 'w') as f:
+                f.write(content)
+            self.logger.info(
+                f"Page content from '{self.url}' downloaded successfully "
+                f"and saved to '{self.path_to_save_page_content}'")
+            return True
+        # TODO: test it
+        except OSError as e:
+            self.logger.error(
+                f"Failed to save page content to "
+                f"'{self.path_to_save_page_content}'. Error: {e}")
+            return False
 
     def __get_soup(self):
         self.logger.info(f"Start download from '{self.url}'")
@@ -64,8 +71,6 @@ class DownloadManager:
 
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Failed to retrieve content. Error: {e}")
-
-        return
 
     def __get_settings(self):
         with open(SETTINGS, 'r') as settings_file:
