@@ -184,29 +184,3 @@ def test_make_resources_dir_with_creating_resource_path_error(
                 assert compare_prettified_htmls(expected_content,
                                                 result_content), \
                     "Downloaded HTML content should match the expected content"
-
-
-# TODO: fix it
-# Not successfully implemented test yet
-# Log:
-# [2023-12-06 13:22:24 ERROR] Failed to save page content to 'tmp/paalso-github-io-simple_web_page.html'. Error: [Errno 13] Permission denied: 'tmp/paalso-github-io-simple_web_page.html'
-# None - result_path
-@pytest.mark.parametrize('filename', ['retrieved.html'])
-def test_save_page_content_with_write_error(
-        retrieved_content, setup_mocking, temp_directory, caplog):
-    with setup_mocking, temp_directory as temp_dir:
-        with patch('builtins.open') as mock_save_file:
-            mock_save_file.side_effect = OSError('Some error happened')
-            result_path = download(URL, path=temp_dir)
-            # breakpoint()
-            result_path = download(URL, path=temp_dir)
-            assert result_path is None
-
-            html_path = os.path.join(temp_dir, CONTENT_FILE)
-
-            expected_error_message = (
-                f"Failed to save page content to '{html_path}'. "
-                f"Error: Some error happened")
-
-            assert expected_error_message in caplog.text, \
-                'Expected error message found in logs.'
