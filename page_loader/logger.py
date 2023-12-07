@@ -27,10 +27,13 @@ class Logger:
     def __configure_logger(self):
         self.__logger.setLevel(self.log_level)
 
-        self.__formatter = logging.Formatter(
-            fmt='[%(asctime)s %(levelname)s] %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
+        if self.log_level == logging.DEBUG:
+            self.__formatter = logging.Formatter(
+                fmt='[%(asctime)s %(levelname)s] %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S'
+            )
+        else:
+            self.__formatter = logging.Formatter(fmt='%(message)s')
 
         self.__add_console_handler()
 
@@ -50,8 +53,9 @@ class Logger:
     @staticmethod
     def __get_level():
         load_dotenv()
-        log_level = os.environ.get('LOG_LEVEL', 'INFO')
-        return getattr(logging, log_level.upper(), logging.DEBUG)
+        env = os.environ.get('ENV', 'production')
+        log_level = logging.DEBUG if env != 'production' else logging.INFO
+        return log_level
 
     def __add_file_handler(self):
         file_handler = logging.FileHandler(self.log_path)
