@@ -7,7 +7,7 @@ from . import url_utils
 from .resource_processor import ResourceProcessor
 from .logger import Logger
 
-SETTINGS = os.path.join('page_loader', 'settings.json')
+SETTINGS_FILE = 'settings.json'
 
 
 class DownloadManager:
@@ -72,7 +72,9 @@ class DownloadManager:
             self.logger.error(f"Failed to retrieve content. Error: {e}")
 
     def __get_settings(self):
-        with open(SETTINGS, 'r') as settings_file:
+        settings_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), SETTINGS_FILE)
+        with open(settings_path, 'r') as settings_file:
             self.__settings = json.load(settings_file)
 
         self.resource_tags = self.__settings['resource_tags']
