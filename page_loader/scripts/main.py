@@ -1,5 +1,6 @@
 import argparse
-from page_loader.download_manager import download
+from page_loader.page_loader import download
+import sys
 
 
 def parse_args():
@@ -14,7 +15,10 @@ def parse_args():
 def main():
     args = parse_args()
     url, path = args.url, args.output
-    download(url, path)
+    result_path = download(url, path)
+    print('Hello!')
+    if result_path:
+        sys.exit(0)
 
 
 if __name__ == '__main__':
