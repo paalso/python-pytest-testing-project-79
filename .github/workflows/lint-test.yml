@@ -23,18 +23,21 @@ jobs:
     # checkout делает pull репозитория и ветки, в котором запущен;
     # таким образом мы получаем доступ к коду
     - name: Pulls the repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     
-    # setup-python@v2 устанавливает python версии ${{ matrix.python-version }}
+    # setup-python@v3 устанавливает python версии ${{ matrix.python-version }}
     # указанной в matrix
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
       
     # Gr1N/setup-poetry@v7 устанавливает python poetry
     - name: setup/install python poetry
       uses: SG60/setup-poetry@v1
+#      Вместо этого можно сделать прямо:
+#      run: curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.5.1 python3 -
+
     # т.к. flake8 и pytest уже есть в dev-зависимостях
     # проекта (описаны в pyproject.toml) в [tool.poetry.dev-dependencies]
     # отдельно их устанавливать не нужно (по идее)
@@ -45,8 +48,15 @@ jobs:
     - name: Install project dependencies with poetry
       run: make install
 
-    - name: Lint with flake8
-      run: make lint
+    - name: Run pytest and linter
+      run: make check
 
-    - name: Test with pytest
-      run: make test
+#    Настройка проверок Code Climate
+    - name: Test & publish code coverage for Code Climate
+      uses: paambaati/codeclimate-action@v3.0.0
+      if: github.ref_name == 'main'
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      with:
+        coverageCommand: make test-coverage
+        debug: true
