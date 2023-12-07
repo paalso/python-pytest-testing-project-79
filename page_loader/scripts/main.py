@@ -15,8 +15,8 @@ def parse_args():
 def main():
     args = parse_args()
     url, path = args.url, args.output
+
     result_path = download(url, path)
-    print('Hello!')
     if result_path:
         sys.exit(0)
 
