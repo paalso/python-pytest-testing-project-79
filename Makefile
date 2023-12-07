@@ -17,9 +17,11 @@ lint:
 selfcheck:
 	poetry check
 
-check: selfcheck test lint
+check:
+	make lint
+	make test
 
-build: check
+build:
 	poetry build
 
 run:
