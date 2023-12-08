@@ -30,4 +30,4 @@ run:
 install-dist:
 	python3 -m pip install --force-reinstall --user $$(ls -t dist/*.whl | head -n 1)
 
-.PHONY: install test lint selfcheck check build
+.PHONY: install test test-cov test-coverage lint selfcheck check build run install-dist
