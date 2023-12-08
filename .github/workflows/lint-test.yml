@@ -1,20 +1,20 @@
 # имя, чтобы отображалось в интерфейсе
-name: 'lint&test'
+name: Python CI
 
 # список событий, на который экшен должен запускаться
-on: [push, pull_request]
+on:
+  - push
+  - pull_request
 
 # список того, что нужно делать
 # каждый job будет выводиться отдельным элементом слева UI
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    
     strategy:
       matrix:
         # we want to test our package on several versions of Python
-        # python-version: [3.6, 3.7, 3.8, 3.9], but let's leave so:
+        # python-version: [3.8, 3.9], but let's leave so:
         python-version: [3.9]
 
     steps:
@@ -23,24 +23,18 @@ jobs:
     # checkout делает pull репозитория и ветки, в котором запущен;
     # таким образом мы получаем доступ к коду
     - name: Pulls the repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     # setup-python@v3 устанавливает python версии ${{ matrix.python-version }}
     # указанной в matrix
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
       
     # Gr1N/setup-poetry@v7 устанавливает python poetry
     - name: setup/install python poetry
       uses: SG60/setup-poetry@v1
-#      Вместо этого можно сделать прямо:
-#      run: curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.5.1 python3 -
-
-    # т.к. flake8 и pytest уже есть в dev-зависимостях
-    # проекта (описаны в pyproject.toml) в [tool.poetry.dev-dependencies]
-    # отдельно их устанавливать не нужно (по идее)
 
     # Принципиальный момент - хоть flake8 и pytest указаны в dev-зависимостях
     # (см. выше), но по умолчанию не устанавливаются
@@ -53,7 +47,7 @@ jobs:
 
 #    Настройка проверок Code Climate
     - name: Test & publish code coverage for Code Climate
-      uses: paambaati/codeclimate-action@v3.0.0
+      uses: paambaati/codeclimate-action@v5.0.0
       if: github.ref_name == 'main'
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
