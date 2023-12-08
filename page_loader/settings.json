@@ -1,5 +1,5 @@
 {
-    "resource_tags": {
+    "asset_tags": {
       "img": "src",
       "link": "href",
       "script": "src",

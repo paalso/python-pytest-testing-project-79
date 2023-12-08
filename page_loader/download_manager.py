@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from . import url_utils
-from .resource_processor import ResourceProcessor
+from .assets_processor import AssetsProcessor
 from .logger import Logger
 
 SETTINGS_FILE = 'settings.json'
@@ -25,14 +25,14 @@ class DownloadManager:
         self.__log_attributes()
 
         if self.soup:
-            self.__resource_processor = ResourceProcessor(self)
+            self.__assets_processor = AssetsProcessor(self)
             self.__get_settings()
 
     def download(self):
         if not self.soup:
             return
 
-        self.__resource_processor.download_resources()
+        self.__assets_processor.download_assets()
         if self.__download_page():
             return self.path_to_save_page_content
 
@@ -47,7 +47,7 @@ class DownloadManager:
         try:
             with open(self.path_to_save_page_content, 'w') as f:
                 f.write(content)
-            self.logger.info(
+            self.logger.debug(
                 f"Page content from '{self.url}' downloaded successfully "
                 f"and saved to '{self.path_to_save_page_content}'")
             return True
@@ -59,7 +59,7 @@ class DownloadManager:
             return False
 
     def __get_soup(self):
-        self.logger.info(f"Start download from '{self.url}'")
+        self.logger.debug(f"Start download from '{self.url}'")
         try:
             response = requests.get(self.url)
             if response.ok:
@@ -77,7 +77,7 @@ class DownloadManager:
         with open(settings_path, 'r') as settings_file:
             self.__settings = json.load(settings_file)
 
-        self.resource_tags = self.__settings['resource_tags']
+        self.asset_tags = self.__settings['asset_tags']
         self.ignore_other_hosts = self.__settings['ignore_other_hosts']
         self.__prettify = self.__settings['prettify']
 

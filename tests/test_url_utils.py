@@ -4,7 +4,7 @@ from page_loader.url_utils import (
     filename_from_full_url,
     full_url,
     base_url,
-    dirname_for_web_resources,
+    dirname_for_web_assets,
     scheme,
     domain,
     full_domain,
@@ -43,15 +43,10 @@ def test_filename_from_full_url():
 
 
 def test_dirname_for_web_resources():
-    assert (
-        dirname_for_web_resources('lorem-github-io-web_page.html')
-        == 'lorem-github-io-web_page_files'
-    )
-    assert (
-        dirname_for_web_resources(
-            'lorem-github-io-web_page.html', 'resources')
-        == 'lorem-github-io-web_page_resources'
-    )
+    assert (dirname_for_web_assets('lorem-github-io-web_page.html')
+            == 'lorem-github-io-web_page_files')
+    assert (dirname_for_web_assets('lorem-github-io-web_page.html', 'resources')
+            == 'lorem-github-io-web_page_resources')
 
 
 def test_full_url():

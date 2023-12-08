@@ -9,13 +9,13 @@ from bs4 import BeautifulSoup
 
 
 URL = 'https://ru.hexlet.io/courses'
-RESOURCES_DIR = 'ru-hexlet-io-courses_files'
+ASSETS_DIR = 'ru-hexlet-io-courses_files'
 CONTENT_FILE = 'ru-hexlet-io-courses.html'
 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(current_file_directory, 'resources.json')) as f:
-    RESOURCES = json.load(f)
+with open(os.path.join(current_file_directory, 'asset.json')) as f:
+    ASSETS = json.load(f)
 
 
 def compare_prettified_htmls(html_content1, html_content2):
@@ -42,8 +42,8 @@ def cleanup_downloaded_files():
 
     if os.path.isfile(CONTENT_FILE):
         os.remove(CONTENT_FILE)
-    if os.path.isdir(RESOURCES_DIR):
-        shutil.rmtree(RESOURCES_DIR)
+    if os.path.isdir(ASSETS_DIR):
+        shutil.rmtree(ASSETS_DIR)
 
 
 @pytest.fixture
@@ -55,11 +55,11 @@ def request_status_code(code=200):
 def setup_mocking(retrieved_content):
     with requests_mock.Mocker() as m:
         m.get(URL, text=retrieved_content)
-        m.get(RESOURCES[-1]['url'], text=retrieved_content)  # href="/courses"
-        for resource_data in RESOURCES:
-            if resource_data['url'].endswith('html'):
-                resource_data['content'] = retrieved_content
-            m.get(resource_data['url'], text=resource_data['content'])
+        m.get(ASSETS[-1]['url'], text=retrieved_content)  # href="/courses"
+        for asset_data in ASSETS:
+            if asset_data['url'].endswith('html'):
+                asset_data['content'] = retrieved_content
+            m.get(asset_data['url'], text=asset_data['content'])
         return m
 
 

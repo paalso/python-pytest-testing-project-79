@@ -24,7 +24,7 @@ def filename_from_full_url(url):
     return f'{domain}{path_part}'
 
 
-def dirname_for_web_resources(content_filename, suffix='files'):
+def dirname_for_web_assets(content_filename, suffix='files'):
     """
     Generate a directory name for saving web resources based
     on the content filename.
