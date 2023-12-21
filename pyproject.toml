@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hexlet-code"
-version = "0.99.0"
+version = "0.99.9"
 description = "The page-loader CLI utility, for downloading web pages from the web"
 authors = ["Pavel Soroka <40a.pvl@gmail.com>"]
 readme = "README.md"

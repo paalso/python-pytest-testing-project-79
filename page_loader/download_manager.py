@@ -18,6 +18,8 @@ class DownloadManager:
         self.page_content_filename = url_utils.filename_from_url(self.url)
         self.path_to_save_page_content = os.path.join(
             path, self.page_content_filename)
+        self.assets_dir = url_utils.dirname_for_web_assets(
+            url_utils.filename_from_url(self.url))
         self.logger = Logger(self.page_content_filename)
 
         self.soup = self.__get_soup()
@@ -89,3 +91,4 @@ class DownloadManager:
                           f'{self.page_content_filename}')
         self.logger.debug(f'path_to_save_page_content:'
                           f'{self.path_to_save_page_content}')
+        self.logger.debug(f'assets_dir: {self.assets_dir}')

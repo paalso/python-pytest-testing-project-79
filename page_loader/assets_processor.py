@@ -10,8 +10,7 @@ class AssetsProcessor:
         self.__full_domain = url_utils.full_domain(self.__download_manager.url)
         self.__base_url = url_utils.base_url(self.__download_manager.url)
         self.__domain = url_utils.domain(self.__download_manager.url)
-        self.__assets_dir = url_utils.dirname_for_web_assets(
-            url_utils.filename_from_url(self.__download_manager.url))
+        self.__assets_dir = self.__download_manager.assets_dir
 
         self.__assets_path = url_utils.dirname_for_web_assets(
             self.__download_manager.path_to_save_page_content)
@@ -105,7 +104,8 @@ class AssetsProcessor:
     # TODO: Move an asset processing logic to a separate class
     def __get_asset_updated_link(self, asset_full_url):
         base_path_to_save = url_utils.filename_from_full_url(asset_full_url)
-        updated_link = os.path.join(self.__assets_dir, base_path_to_save)
+        updated_link = os.path.join(
+            self.__download_manager.assets_dir, base_path_to_save)
         self.__logger.debug(f'Updated asset link: {updated_link}')
         return updated_link
 
@@ -147,5 +147,4 @@ class AssetsProcessor:
         self.__logger.debug(f'domain: {self.__domain}')
         self.__logger.debug(f'base_url: {self.__base_url}')
         self.__logger.debug(f'full_domain: {self.__full_domain}')
-        self.__logger.debug(f'assets_dir: {self.__assets_dir}')
         self.__logger.debug(f'assets_path: {self.__assets_path}')
