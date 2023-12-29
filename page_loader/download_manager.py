@@ -7,6 +7,7 @@ from . import url_utils
 from .assets_processor import AssetsProcessor
 from .logger import Logger
 from .exceptions.network_exceptions import HttpError, RequestError
+from .exceptions.io_exceptions import SaveError, DirectoryError
 
 SETTINGS_FILE = 'settings.json'
 
@@ -15,6 +16,7 @@ class DownloadManager:
     def __init__(self, url, path):
         self.url = url
         self.path = path or ''
+        self.__validate_path()
 
         self.page_content_filename = url_utils.filename_from_url(self.url)
         self.path_to_save_page_content = os.path.join(
@@ -36,12 +38,12 @@ class DownloadManager:
             return
 
         self.__assets_processor.download_assets()
-        if self.__download_page():
-            return self.path_to_save_page_content
+        self.__download_page()
+        return self.path_to_save_page_content
 
     def __download_page(self):
         processed_page_content = self.__process_page_content()
-        return self.__save_page_content(processed_page_content)
+        self.__save_page_content(processed_page_content)
 
     def __process_page_content(self):
         return self.soup.prettify() if self.__prettify else str(self.soup)
@@ -53,13 +55,13 @@ class DownloadManager:
             self.logger.debug(
                 f"Page content from '{self.url}' downloaded successfully "
                 f"and saved to '{self.path_to_save_page_content}'")
-            return True
+
         # TODO: test it
         except OSError as e:
-            self.logger.debug(
-                f"Failed to save page content to "
-                f"'{self.path_to_save_page_content}'. Error: {e}")
-            return False
+            error_message = (f"Failed to save page content to "
+                             f"{self.path_to_save_page_content}. Error: {e}")
+            self.logger.debug(error_message)
+            raise SaveError
 
     def __get_soup(self):
         self.logger.debug(f"Start download from '{self.url}'")
@@ -87,6 +89,10 @@ class DownloadManager:
         self.asset_tags = self.__settings['asset_tags']
         self.ignore_other_hosts = self.__settings['ignore_other_hosts']
         self.__prettify = self.__settings['prettify']
+
+    def __validate_path(self):
+        if self.path and not os.path.exists(self.path):
+            raise DirectoryError(f"Directory '{self.path}' does not exist.")
 
     def __log_attributes(self):
         self.logger.debug(f'{self.__class__.__name__} initialized')
