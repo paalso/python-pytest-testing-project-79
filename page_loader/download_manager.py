@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from . import url_utils
 from .assets_processor import AssetsProcessor
 from .logger import Logger
+from .exceptions.network_exceptions import HttpError, RequestError
 
 SETTINGS_FILE = 'settings.json'
 
@@ -55,7 +56,7 @@ class DownloadManager:
             return True
         # TODO: test it
         except OSError as e:
-            self.logger.error(
+            self.logger.debug(
                 f"Failed to save page content to "
                 f"'{self.path_to_save_page_content}'. Error: {e}")
             return False
@@ -67,11 +68,15 @@ class DownloadManager:
             if response.ok:
                 return BeautifulSoup(response.text, 'html.parser')
 
-            self.logger.error(f"Failed to retrieve content. Server returned "
-                              f"status code {response.status_code}")
+            error_msg = (f'Failed to retrieve content. '
+                         f'Server returned status code {response.status_code}')
+            self.logger.debug(error_msg)
+            raise HttpError(error_msg)
 
         except requests.exceptions.RequestException as e:
-            self.logger.error(f"Failed to retrieve content. Error: {e}")
+            error_msg = f'Failed to retrieve content. Error: {e}'
+            self.logger.debug(error_msg)
+            raise RequestError(error_msg)
 
     def __get_settings(self):
         settings_path = os.path.join(

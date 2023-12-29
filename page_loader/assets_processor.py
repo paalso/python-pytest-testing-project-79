@@ -91,7 +91,7 @@ class AssetsProcessor:
             return True
 
         except OSError as e:
-            self.__logger.error(f'Failed to create assets directory: '
+            self.__logger.debug(f'Failed to create assets directory: '
                                 f'{self.__assets_path}. Error: {e}')
             return False
 
@@ -139,7 +139,7 @@ class AssetsProcessor:
                     f"Failed to download asset file '{url}'"
                     f'Status code: {response.status_code}')
         except requests.exceptions.RequestException as e:
-            self.__logger.error(f"Failed to download asset file '{url}'. "
+            self.__logger.debug(f"Failed to download asset file '{url}'. "
                                 f"Error: {e}")
 
     def __log_attributes(self):
