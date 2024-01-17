@@ -2,13 +2,11 @@
 
 import os
 import pytest
-import re
 import stat
-import logging
 from unittest.mock import patch
 
 from page_loader import download
-from page_loader.exceptions.io_exceptions import SaveError
+from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
 
 from fixtures.fixtures import (
     URL,
@@ -133,3 +131,17 @@ def test_save_error_permission_issue(
                                  f"Error: [Errno 13] Permission denied")
 
         assert error_message_pattern in str(e.value)
+
+
+# Test the handling of a missing destination directory during download
+@pytest.mark.parametrize(
+    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
+def test_missing_destination_directory_issue(
+        retrieved_content, setup_mocking, temp_directory):
+    with setup_mocking, temp_directory as temp_dir:
+        os.rmdir(temp_dir)
+        with pytest.raises(DirectoryError) as e:
+            download(URL, path=temp_dir)
+
+    error_message = f"Directory '{temp_dir}' does not exist."
+    assert str(e.value) == error_message

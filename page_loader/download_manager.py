@@ -56,7 +56,6 @@ class DownloadManager:
                 f"Page content from '{self.url}' downloaded successfully "
                 f"and saved to '{self.path_to_save_page_content}'")
 
-        # TODO: test it
         except OSError as e:
             error_message = (f"Failed to save page content to "
                              f"{self.path_to_save_page_content}. Error: {e}")
