@@ -61,7 +61,7 @@ class DownloadManager:
             error_message = (f"Failed to save page content to "
                              f"{self.path_to_save_page_content}. Error: {e}")
             self.logger.debug(error_message)
-            raise SaveError
+            raise SaveError(error_message)
 
     def __get_soup(self):
         self.logger.debug(f"Start download from '{self.url}'")

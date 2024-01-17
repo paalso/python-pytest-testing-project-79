@@ -2,11 +2,13 @@
 
 import os
 import pytest
+import re
+import stat
 import logging
 from unittest.mock import patch
 
 from page_loader import download
-
+from page_loader.exceptions.io_exceptions import SaveError
 
 from fixtures.fixtures import (
     URL,
@@ -102,10 +104,32 @@ def test_download_html_without_assets_to_download(
 @pytest.mark.parametrize(
     'filename', ['retrieved.html', 'retrieved_without_assets.html'])
 def test_download_return_value_with_none_path(
-        retrieved_content, cleanup_downloaded_files, setup_mocking):
+        retrieved_content, setup_mocking, cleanup_downloaded_files):
     with setup_mocking:
         result_path = download(URL)
         assert os.path.isfile(result_path), \
             f"Downloaded file {result_path} should exist"
         assert result_path == 'ru-hexlet-io-courses.html', \
             f'Downloaded file path should be {CONTENT_FILE}'
+
+
+# Test the save error scenario when attempting to save content with permission issues
+# TODO: Perhaps the test should be generalized
+# TODO: Or add other scenarios - for example, when there is not enough disk space
+@pytest.mark.parametrize(
+    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
+def test_save_error_permission_issue(
+        retrieved_content, setup_mocking, temp_directory):
+    with setup_mocking, temp_directory as temp_dir:
+        html_path = os.path.join(temp_dir, CONTENT_FILE)
+        with open(html_path, 'w'):
+            pass
+        os.chmod(html_path, stat.S_IREAD)
+
+        with pytest.raises(SaveError) as e:
+            download(URL, path=temp_dir)
+
+        error_message_pattern = (f"Failed to save page content to {html_path}. "
+                                 f"Error: [Errno 13] Permission denied")
+
+        assert error_message_pattern in str(e.value)

@@ -47,7 +47,7 @@ def handle_result(result_path):
         sys.exit(0)
 
 
-def handle_exceptions(info_logger, error_logger, args):     # noqa: C901
+def download(info_logger, error_logger, args):     # noqa: C901
     try:
         download_manager = DownloadManager(args.url, args.output)
         result_path = download_manager.download()
@@ -82,7 +82,7 @@ def main():
     error_logger = logging.getLogger('error_logger')
 
     log_arguments(info_logger, args)
-    handle_exceptions(info_logger, error_logger, args)
+    download(info_logger, error_logger, args)
 
 
 if __name__ == '__main__':
