@@ -125,7 +125,11 @@ def test_save_error_permission_issue(
         os.chmod(html_path, stat.S_IREAD)
 
         with pytest.raises(SaveError) as e:
-            download(URL, path=temp_dir)
+            result_path = download(URL, path=temp_dir)
+
+            assert result_path is None, \
+                ("If there is a save error due to permission issues, "
+                 "download should fail and result_path should be None")
 
         error_message_pattern = (f"Failed to save page content to {html_path}. "
                                  f"Error: [Errno 13] Permission denied")
@@ -141,7 +145,11 @@ def test_missing_destination_directory_issue(
     with setup_mocking, temp_directory as temp_dir:
         os.rmdir(temp_dir)
         with pytest.raises(DirectoryError) as e:
-            download(URL, path=temp_dir)
+            result_path = download(URL, path=temp_dir)
+
+            assert result_path is None, \
+                (f'If the destination directory is missing, '
+                 f'download should fail and result_path should be None')
 
     error_message = f"Directory '{temp_dir}' does not exist."
     assert str(e.value) == error_message
