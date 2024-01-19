@@ -1,9 +1,9 @@
 # flake8: noqa: F401, F811
 
+
 import os
 import pytest
 import stat
-from unittest.mock import patch
 
 from page_loader import download
 from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
@@ -113,9 +113,9 @@ def test_download_return_value_with_none_path(
             f'Downloaded file path should be {CONTENT_FILE}'
 
 
-# Test the save error scenario when attempting to save content with permission issues
+# Test the processing of an attempt to save content with access rights issues
 # TODO: Perhaps the test should be generalized
-# TODO: Or add other scenarios - for example, when there is not enough disk space
+# TODO: Or add other scenarios - for example, when there's no enough disk space
 @pytest.mark.parametrize(
     'filename', ['retrieved.html', 'retrieved_without_assets.html'])
 def test_save_error_permission_issue(
@@ -144,7 +144,7 @@ def test_save_error_permission_issue(
         #      'if the download fails')
 
 
-# Test the handling of a missing destination directory during download
+# Test the processing of a missing destination directory during download
 @pytest.mark.parametrize(
     'filename', ['retrieved.html', 'retrieved_without_assets.html'])
 def test_missing_destination_directory_issue(
@@ -155,13 +155,14 @@ def test_missing_destination_directory_issue(
             result_path = download(URL, path=temp_dir)
 
             assert result_path is None, \
-                (f'If the destination directory is missing, '
-                 f'download should fail and result_path should be None')
+                ('If the destination directory is missing, '
+                 'download should fail and result_path should be None')
 
     error_message = f"Directory '{temp_dir}' does not exist."
     assert str(e.value) == error_message
 
 
+# Test the processing of various HTTP error responses
 @pytest.mark.parametrize('status_code', HTTP_ERROR_CODES)
 def test_download_html_with_http_fail_response(
         setup_mocking_http_fail_response, temp_directory, status_code):
@@ -181,4 +182,27 @@ def test_download_html_with_http_fail_response(
 
         error_message = (f'Failed to retrieve content. '
                          f'Server returned status code {status_code}')
+        assert str(e.value) == error_message
+
+
+# Test the processing of RequestException during download
+def test_download_html_with_request_error(
+        setup_mocking_request_exception, temp_directory):
+
+    with setup_mocking_request_exception, temp_directory as temp_dir:
+        with pytest.raises(RequestError) as e:
+            result_path = download(URL, path=temp_dir)
+
+            assert result_path is None, (
+                "If there is an HTTP error response, "
+                "download should fail and result_path should be None"
+            )
+
+        assert not any(os.listdir(temp_dir)), \
+            ('No files should be created in the destination directory '
+             'if the download fails')
+
+        error_message = \
+            ('Failed to retrieve content. '
+             'Error: Some simulated RequestException')
         assert str(e.value) == error_message

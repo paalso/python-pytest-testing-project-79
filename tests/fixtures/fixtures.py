@@ -66,15 +66,15 @@ def temp_directory():
 
 
 @pytest.fixture
-def setup_mocking_request_exception():
+def setup_mocking_http_fail_response(status_code):
     with requests_mock.Mocker() as m:
-        m.get(URL, exc=requests.exceptions.RequestException(
-            'Failed to retrieve content. Error: Simulated RequestException'))
+        m.get(URL, status_code=status_code)
         return m
 
 
 @pytest.fixture
-def setup_mocking_http_fail_response(status_code):
+def setup_mocking_request_exception():
     with requests_mock.Mocker() as m:
-        m.get(URL, status_code=status_code)
+        m.get(URL, exc=requests.exceptions.RequestException(
+            'Some simulated RequestException'))
         return m
