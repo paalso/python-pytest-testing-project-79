@@ -7,18 +7,20 @@ from unittest.mock import patch
 
 from page_loader import download
 from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
+from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
 from fixtures.fixtures import (
     URL,
     ASSETS_DIR,
     CONTENT_FILE,
     ASSETS,
+    HTTP_ERROR_CODES,
     compare_prettified_htmls,
     retrieved_content,
     expected_content,
     cleanup_downloaded_files,
     setup_mocking,
-    setup_mocking_404,
+    setup_mocking_http_fail_response,
     setup_mocking_request_exception,
     temp_directory
 )
@@ -136,6 +138,11 @@ def test_save_error_permission_issue(
 
         assert error_message_pattern in str(e.value)
 
+        # TODO: implement logic to pass it
+        # assert not any(os.listdir(temp_dir)), \
+        #     ('No files should be created in the destination directory '
+        #      'if the download fails')
+
 
 # Test the handling of a missing destination directory during download
 @pytest.mark.parametrize(
@@ -153,3 +160,25 @@ def test_missing_destination_directory_issue(
 
     error_message = f"Directory '{temp_dir}' does not exist."
     assert str(e.value) == error_message
+
+
+@pytest.mark.parametrize('status_code', HTTP_ERROR_CODES)
+def test_download_html_with_http_fail_response(
+        setup_mocking_http_fail_response, temp_directory, status_code):
+
+    with setup_mocking_http_fail_response, temp_directory as temp_dir:
+        with pytest.raises(HttpError) as e:
+            result_path = download(URL, path=temp_dir)
+
+            assert result_path is None, (
+                "If there is an HTTP error response, "
+                "download should fail and result_path should be None"
+            )
+
+        assert not any(os.listdir(temp_dir)), \
+            ('No files should be created in the destination directory '
+             'if the download fails')
+
+        error_message = (f'Failed to retrieve content. '
+                         f'Server returned status code {status_code}')
+        assert str(e.value) == error_message

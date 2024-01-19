@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 URL = 'https://ru.hexlet.io/courses'
 ASSETS_DIR = 'ru-hexlet-io-courses_files'
 CONTENT_FILE = 'ru-hexlet-io-courses.html'
+HTTP_ERROR_CODES = 400, 401, 403, 404, 405, 408, 500, 501, 502, 503, 504, 505
 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,11 +48,6 @@ def cleanup_downloaded_files():
 
 
 @pytest.fixture
-def request_status_code(code=200):
-    return code
-
-
-@pytest.fixture
 def setup_mocking(retrieved_content):
     with requests_mock.Mocker() as m:
         m.get(URL, text=retrieved_content)
@@ -60,13 +56,6 @@ def setup_mocking(retrieved_content):
             if asset_data['url'].endswith('html'):
                 asset_data['content'] = retrieved_content
             m.get(asset_data['url'], text=asset_data['content'])
-        return m
-
-
-@pytest.fixture
-def setup_mocking_404():
-    with requests_mock.Mocker() as m:
-        m.get(URL, status_code=404)
         return m
 
 
@@ -81,4 +70,11 @@ def setup_mocking_request_exception():
     with requests_mock.Mocker() as m:
         m.get(URL, exc=requests.exceptions.RequestException(
             'Failed to retrieve content. Error: Simulated RequestException'))
+        return m
+
+
+@pytest.fixture
+def setup_mocking_http_fail_response(status_code):
+    with requests_mock.Mocker() as m:
+        m.get(URL, status_code=status_code)
         return m
