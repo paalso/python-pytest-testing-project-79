@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "hexlet-code"
 version = "1.0.0"
-description = "The page-loader CLI utility, for downloading web pages from the web"
+description = "A command line utility to download web pages from the Internet to the local machine."
 authors = ["Pavel Soroka <40a.pvl@gmail.com>"]
 readme = "README.md"
 packages = [{include = "page_loader"}]

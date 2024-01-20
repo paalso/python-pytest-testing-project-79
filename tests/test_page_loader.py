@@ -1,6 +1,3 @@
-# flake8: noqa: F401, F811
-
-
 import os
 import pytest
 import stat
