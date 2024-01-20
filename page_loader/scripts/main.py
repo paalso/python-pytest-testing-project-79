@@ -3,6 +3,7 @@ from page_loader.download_manager import DownloadManager
 from page_loader.exceptions.network_exceptions import HttpError, RequestError
 from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
 import logging
+import os
 import sys
 import time
 
@@ -46,7 +47,7 @@ def handle_result(result_path, elapsed_time):
     if result_path:
         print(f'Page was downloaded as \'{result_path}\'')
         print(f'Elapsed time: {elapsed_time:.2f} seconds')
-        sys.exit(0)
+        sys.exit(os.EX_OK)
 
 
 def download(info_logger, error_logger, args):     # noqa: C901
@@ -59,24 +60,24 @@ def download(info_logger, error_logger, args):     # noqa: C901
         handle_result(result_path, elapsed_time)
 
     except HttpError as e:
-        error_logger.error(f'HTTP error occurred. {e}')
-        sys.exit(1)
+        error_logger.error(e)
+        sys.exit(os.EX_PROTOCOL)
 
     except RequestError as e:
-        error_logger.error(f'Request error occurred. {e}')
-        sys.exit(1)
+        error_logger.error(e)
+        sys.exit(os.EX_UNAVAILABLE)
 
     except SaveError as e:
-        error_logger.error(f'Write html file error occurred. {e}')
-        sys.exit(2)
+        error_logger.error(e)
+        sys.exit(os.EX_OSFILE)
 
     except DirectoryError as e:
         error_logger.error(e)
-        sys.exit(2)
+        sys.exit(os.EX_IOERR)
 
     except Exception as e:
-        error_logger.error(f'Some other error occurred. {e}')
-        sys.exit(3)
+        error_logger.error(f'Some ubexpected error:\n{e}')
+        sys.exit(os.EX_SOFTWARE)
 
 
 def main():
