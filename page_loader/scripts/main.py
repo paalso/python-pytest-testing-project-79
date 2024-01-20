@@ -4,12 +4,13 @@ from page_loader.exceptions.network_exceptions import HttpError, RequestError
 from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
 import logging
 import sys
+import time
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Download web page')
+    parser = argparse.ArgumentParser(description='Web page downloader')
     parser.add_argument('url', metavar='url')
-    parser.add_argument('-o', '--output', help='set directory of output')
+    parser.add_argument('-o', '--output', help='output directory ')
     return parser.parse_args()
 
 
@@ -41,18 +42,21 @@ def log_download_info(logger, download_manager):
     logger.info(f'create directory for assets: {assets_dir}')
 
 
-def handle_result(result_path):
+def handle_result(result_path, elapsed_time):
     if result_path:
         print(f'Page was downloaded as \'{result_path}\'')
+        print(f'Elapsed time: {elapsed_time:.2f} seconds')
         sys.exit(0)
 
 
 def download(info_logger, error_logger, args):     # noqa: C901
     try:
+        start_time = time.time()
         download_manager = DownloadManager(args.url, args.output)
         result_path = download_manager.download()
         log_download_info(info_logger, download_manager)
-        handle_result(result_path)
+        elapsed_time = time.time() - start_time
+        handle_result(result_path, elapsed_time)
 
     except HttpError as e:
         error_logger.error(f'HTTP error occurred. {e}')
