@@ -1,7 +1,7 @@
+from bs4 import BeautifulSoup
 import json
 import os
 import requests
-from bs4 import BeautifulSoup
 
 from . import url_utils
 from .assets_processor import AssetsProcessor
@@ -59,6 +59,8 @@ class DownloadManager:
         except OSError as e:
             error_message = (f"Failed to save page content to "
                              f"{self.path_to_save_page_content}. Error: {e}")
+
+            self.__assets_processor.remove_assets_dir()
             self.logger.debug(error_message)
             raise SaveError(error_message)
 

@@ -136,9 +136,12 @@ def test_save_error_permission_issue(
         assert error_message_pattern in str(e.value)
 
         # TODO: implement logic to pass it
-        # assert not any(os.listdir(temp_dir)), \
-        #     ('No files should be created in the destination directory '
-        #      'if the download fails')
+        # import pdb; pdb.set_trace()
+        unexpected_files = [file_name for file_name in os.listdir(temp_dir)
+                            if file_name != CONTENT_FILE]
+        assert not any(unexpected_files), \
+            (f'No files (except for {CONTENT_FILE}) should remain in '
+             f'the destination directory if the download fails.')
 
 
 # Test the processing of a missing destination directory during download

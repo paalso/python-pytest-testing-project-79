@@ -33,6 +33,15 @@ class AssetsProcessor:
         if not processed_assets_exist:
             self.__remove_assets_dir()
 
+    def remove_assets_dir(self):
+        try:
+            shutil.rmtree(self.__assets_path)
+            self.__logger.debug(
+                f'Removed assets directory: {self.__assets_path}')
+        except Exception as e:
+            self.__logger.debug(
+                f'Failed to remove assets directory: {self.__assets_path}: {e}')
+
     def __get_page_assets(self):
         return [asset for tag in self.__download_manager.asset_tags
                 for asset in self.__download_manager.soup.find_all(tag)]
@@ -94,11 +103,6 @@ class AssetsProcessor:
             self.__logger.debug(f'Failed to create assets directory: '
                                 f'{self.__assets_path}. Error: {e}')
             return False
-
-    def __remove_assets_dir(self):
-        shutil.rmtree(self.__assets_path)
-        self.__logger.debug(
-            f'Removed empty assets directory: {self.__assets_path}')
 
     # TODO: Maybe refactoring is needed again
     # TODO: Move an asset processing logic to a separate class
