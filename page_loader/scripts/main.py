@@ -77,7 +77,7 @@ def download(info_logger, error_logger, args):     # noqa: C901
         sys.exit(os.EX_IOERR)
 
     except Exception as e:
-        error_logger.error(f'Some ubexpected error:\n{e}')
+        error_logger.error(f'Some unexpected error:\n{e}')
         sys.exit(os.EX_SOFTWARE)
 
 
