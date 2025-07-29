@@ -1,0 +1,25 @@
+*.egg-info
+__pycache__
+dist/
+_sample_inputs/
+*.pyc
+.venv/
+.coverage
+coverage.xml
+.pytest_cache/
+.vim
+.env
+tmp*
+temp*
+log*
+
+# Visual Studio Code #
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+# Idea PyCharm #
+.idea/
