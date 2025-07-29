@@ -13,7 +13,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Web page downloader')
     parser.add_argument('url', metavar='url')
     parser.add_argument(
-        '-o', '--output', required=True, help='output directory ')
+        '-o', '--output',
+        help='Output directory',
+        default=os.getcwd()
+    )
     return parser.parse_args()
 
 
