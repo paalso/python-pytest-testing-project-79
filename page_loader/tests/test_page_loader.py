@@ -1,26 +1,19 @@
 import os
-import pytest
 import stat
 
-from page_loader import download
-from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
-from page_loader.exceptions.network_exceptions import HttpError, RequestError
-
+import pytest
 from fixtures.fixtures import (
-    URL,
+    ASSETS,
     ASSETS_DIR,
     CONTENT_FILE,
-    ASSETS,
     HTTP_ERROR_CODES,
+    URL,
     compare_prettified_htmls,
-    retrieved_content,
-    expected_content,
-    cleanup_downloaded_files,
-    setup_mocking,
-    setup_mocking_http_fail_response,
-    setup_mocking_request_exception,
-    temp_directory
 )
+
+from page_loader import download
+from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
+from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
 
 # Test the download of HTML content

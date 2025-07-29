@@ -1,16 +1,16 @@
 # tests/test_url_utils.py
 from page_loader.url_utils import (
-    filename_from_url,
-    filename_from_full_url,
-    full_url,
     base_url,
     dirname_for_web_assets,
-    scheme,
     domain,
-    full_domain,
     extension,
     file_name,
-    is_absolute_path
+    filename_from_full_url,
+    filename_from_url,
+    full_domain,
+    full_url,
+    is_absolute_path,
+    scheme,
 )
 
 
