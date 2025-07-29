@@ -1,12 +1,12 @@
 import json
 import os
-import shutil
-import tempfile
-
-import pytest
 import requests
 import requests_mock
+import tempfile
+import pytest
+import shutil
 from bs4 import BeautifulSoup
+
 
 URL = 'https://ru.hexlet.io/courses'
 ASSETS_DIR = 'ru-hexlet-io-courses_files'

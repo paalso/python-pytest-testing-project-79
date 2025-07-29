@@ -1,8 +1,7 @@
-import logging
-import os
 from datetime import datetime
-
+import logging
 from dotenv import load_dotenv
+import os
 
 LOGS_DIR = 'logs'
 LOG_FILE_TEMPLATE = 'download_{formatted_page_content_filename}_{date_time}.log'
