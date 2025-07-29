@@ -1,0 +1,43 @@
+# имя, чтобы отображалось в интерфейсе
+name: Python CI
+
+# список событий, на который экшен должен запускаться
+on:
+  - push
+  - pull_request
+
+# список того, что нужно делать
+# каждый job будет выводиться отдельным элементом слева UI
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # we want to test our package on several versions of Python
+        # python-version: [3.8, 3.9], but let's leave so:
+        python-version: [3.9]
+
+    steps:
+    # uses указывает имена уже написанных экшенов, к-е хотим использовать
+
+    # checkout делает pull репозитория и ветки, в котором запущен;
+    # таким образом мы получаем доступ к коду
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # setup-python@v3 устанавливает python версии ${{ matrix.python-version }}
+    # указанной в matrix
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      run: pip install uv
+
+    # Принципиальный момент: зависимостях нужно установить явно
+    - name: Install project dependencies with uv
+      run: make sync
+
+    - name: Run pytest and linter
+      run: make check
