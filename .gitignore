@@ -11,7 +11,10 @@ coverage.xml
 .env
 tmp*
 temp*
-log*
+*.log
+log.txt
+logs/
+
 
 # Visual Studio Code #
 .vscode/*

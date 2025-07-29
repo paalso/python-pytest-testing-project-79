@@ -10,13 +10,14 @@ sync:  ## Sync dependencies from pyproject.toml
 	uv sync
 
 install-dist:  ## Install latest build wheel (dist/*.whl)
-	python3 -m pip install --force-reinstall --user $$(ls -t dist/*.whl | head -n 1)
+	 uv tool install $$(ls -t dist/*.whl | head -n 1)
 
-selfcheck:  ## Check for common issues in pyproject.toml
-	uv run hatch check
+reinstall-dist:  ## Reinstall latest built wheel via uv tool
+	@uv tool uninstall hexlet-code || true
+	@uv tool install $(ls -t dist/*.whl | head -n 1)
 
 build:  ## Build the project (wheel)
-	uv run hatch build
+	uv build
 
 run:  ## Run the app with arguments: ARGS="url -o tmp"
 	uv run python3 page_loader/scripts/main.py $(ARGS)
