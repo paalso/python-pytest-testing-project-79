@@ -1,33 +1,27 @@
 import os
-import pytest
 import stat
 
+import pytest
+
 from page_loader import download
-from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
+from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
 from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
-from fixtures.fixtures import (
+
+from .fixtures.fixtures import (
     URL,
     ASSETS_DIR,
     CONTENT_FILE,
     ASSETS,
     HTTP_ERROR_CODES,
-    compare_prettified_htmls,
-    retrieved_content,
-    expected_content,
-    cleanup_downloaded_files,
-    setup_mocking,
-    setup_mocking_http_fail_response,
-    setup_mocking_request_exception,
-    temp_directory
+    compare_prettified_htmls
 )
 
 
 # Test the download of HTML content
 @pytest.mark.parametrize(
     'filename', ['retrieved.html'])
-def test_download_html(
-        expected_content, retrieved_content, setup_mocking, temp_directory):
+def test_download_html(filename, expected_content, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         result_path = download(URL, path=temp_dir)
 
@@ -45,8 +39,7 @@ def test_download_html(
 
 # Test the download of assets and ensure proper link transformation
 @pytest.mark.parametrize('filename', ['retrieved.html'])
-def test_download_assets(
-        expected_content, retrieved_content, setup_mocking, temp_directory):
+def test_download_assets(filename, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         download(URL, path=temp_dir)
         assets_dir_path = os.path.join(temp_dir, ASSETS_DIR)
@@ -90,7 +83,7 @@ def test_download_assets(
 
 @pytest.mark.parametrize('filename', ['retrieved_without_assets.html'])
 def test_download_html_without_assets_to_download(
-        filename, retrieved_content, setup_mocking, temp_directory):
+        filename, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         download(URL, path=temp_dir)
         assets_dir_path = os.path.join(temp_dir, ASSETS_DIR)
@@ -101,7 +94,7 @@ def test_download_html_without_assets_to_download(
 @pytest.mark.parametrize(
     'filename', ['retrieved.html', 'retrieved_without_assets.html'])
 def test_download_return_value_with_none_path(
-        retrieved_content, setup_mocking, cleanup_downloaded_files):
+        filename, setup_mocking, cleanup_downloaded_files):
     with setup_mocking:
         result_path = download(URL)
         assert os.path.isfile(result_path), \
@@ -115,8 +108,7 @@ def test_download_return_value_with_none_path(
 # TODO: Or add other scenarios - for example, when there's no enough disk space
 @pytest.mark.parametrize(
     'filename', ['retrieved.html', 'retrieved_without_assets.html'])
-def test_save_error_permission_issue(
-        retrieved_content, setup_mocking, temp_directory):
+def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         html_path = os.path.join(temp_dir, CONTENT_FILE)
         with open(html_path, 'w'):
@@ -147,8 +139,7 @@ def test_save_error_permission_issue(
 # Test the processing of a missing destination directory during download
 @pytest.mark.parametrize(
     'filename', ['retrieved.html', 'retrieved_without_assets.html'])
-def test_missing_destination_directory_issue(
-        retrieved_content, setup_mocking, temp_directory):
+def test_missing_destination_directory_issue(filename, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         os.rmdir(temp_dir)
         with pytest.raises(DirectoryError) as e:

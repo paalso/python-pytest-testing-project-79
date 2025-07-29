@@ -1,13 +1,14 @@
-from bs4 import BeautifulSoup
 import json
 import os
+
 import requests
+from bs4 import BeautifulSoup
 
 from . import url_utils
 from .assets_processor import AssetsProcessor
-from .logger import Logger
+from .exceptions.io_exceptions import DirectoryError, SaveError
 from .exceptions.network_exceptions import HttpError, RequestError
-from .exceptions.io_exceptions import SaveError, DirectoryError
+from .logger import Logger
 
 SETTINGS_FILE = 'settings.json'
 

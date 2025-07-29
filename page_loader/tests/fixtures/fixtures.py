@@ -1,12 +1,12 @@
 import json
 import os
+import shutil
+import tempfile
+
+import pytest
 import requests
 import requests_mock
-import tempfile
-import pytest
-import shutil
 from bs4 import BeautifulSoup
-
 
 URL = 'https://ru.hexlet.io/courses'
 ASSETS_DIR = 'ru-hexlet-io-courses_files'
@@ -48,14 +48,19 @@ def cleanup_downloaded_files():
 
 
 @pytest.fixture
-def setup_mocking(retrieved_content):
+def setup_mocking(filename):
+    with open(os.path.join(current_file_directory, filename)) as f:
+        retrieved_content = f.read()
+
     with requests_mock.Mocker() as m:
         m.get(URL, text=retrieved_content)
-        m.get(ASSETS[-1]['url'], text=retrieved_content)  # href="/courses"
+        m.get(ASSETS[-1]['url'], text=retrieved_content)  # например: href="/courses"
+
         for asset_data in ASSETS:
             if asset_data['url'].endswith('html'):
                 asset_data['content'] = retrieved_content
             m.get(asset_data['url'], text=asset_data['content'])
+
         return m
 
 

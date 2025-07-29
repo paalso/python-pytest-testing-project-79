@@ -1,11 +1,12 @@
 import argparse
-from page_loader.download_manager import DownloadManager
-from page_loader.exceptions.network_exceptions import HttpError, RequestError
-from page_loader.exceptions.io_exceptions import SaveError, DirectoryError
 import logging
 import os
 import sys
 import time
+
+from page_loader.download_manager import DownloadManager
+from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
+from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
 
 def parse_args():
