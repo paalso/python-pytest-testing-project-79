@@ -7,21 +7,21 @@ from page_loader import download
 from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
 from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
-
 from .fixtures.fixtures import (
-    URL,
+    ASSETS,
     ASSETS_DIR,
     CONTENT_FILE,
-    ASSETS,
     HTTP_ERROR_CODES,
-    compare_prettified_htmls
+    URL,
+    compare_prettified_htmls,
 )
 
 
 # Test the download of HTML content
 @pytest.mark.parametrize(
     'filename', ['retrieved.html'])
-def test_download_html(filename, expected_content, setup_mocking, temp_directory):
+def test_download_html(
+        filename, expected_content, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         result_path = download(URL, path=temp_dir)
 
@@ -139,7 +139,8 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
 # Test the processing of a missing destination directory during download
 @pytest.mark.parametrize(
     'filename', ['retrieved.html', 'retrieved_without_assets.html'])
-def test_missing_destination_directory_issue(filename, setup_mocking, temp_directory):
+def test_missing_destination_directory_issue(
+        filename, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         os.rmdir(temp_dir)
         with pytest.raises(DirectoryError) as e:
