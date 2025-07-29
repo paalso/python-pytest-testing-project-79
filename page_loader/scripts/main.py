@@ -12,7 +12,8 @@ from page_loader.exceptions.network_exceptions import HttpError, RequestError
 def parse_args():
     parser = argparse.ArgumentParser(description='Web page downloader')
     parser.add_argument('url', metavar='url')
-    parser.add_argument('-o', '--output', help='output directory ')
+    parser.add_argument(
+        '-o', '--output', required=True, help='output directory ')
     return parser.parse_args()
 
 
@@ -77,7 +78,7 @@ def download(info_logger, error_logger, args):     # noqa: C901
         sys.exit(os.EX_IOERR)
 
     except Exception as e:
-        error_logger.error(f'Some ubexpected error:\n{e}')
+        error_logger.error(f'Some unexpected error:\n{e}')
         sys.exit(os.EX_SOFTWARE)
 
 

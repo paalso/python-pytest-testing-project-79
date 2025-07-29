@@ -12,9 +12,13 @@ sync:  ## Sync dependencies from pyproject.toml
 install-dist:  ## Install latest build wheel (dist/*.whl)
 	 uv tool install $$(ls -t dist/*.whl | head -n 1)
 
-reinstall-dist:  ## Reinstall latest built wheel via uv tool
+uninstall:
 	@uv tool uninstall hexlet-code || true
-	@uv tool install $(ls -t dist/*.whl | head -n 1)
+
+reinstall-dist:  ## Reinstall latest built wheel via uv tool
+	$(MAKE) uninstall
+	$(MAKE) build
+	$(MAKE) install-dist
 
 build:  ## Build the project (wheel)
 	uv build
