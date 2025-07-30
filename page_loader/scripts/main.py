@@ -55,11 +55,17 @@ def handle_result(result_path, elapsed_time):
         sys.exit(os.EX_OK)
 
 
-def download(info_logger, error_logger, args):     # noqa: C901
+def download(info_logger, error_logger, args):  # noqa: C901
     try:
         start_time = time.time()
         download_manager = DownloadManager(args.url, args.output)
         result_path = download_manager.download()
+
+        if result_path is None:
+            error_logger.error(
+                f'Failed to download page: no content at {args.url}')
+            sys.exit(os.EX_OSFILE)
+
         log_download_info(info_logger, download_manager)
         elapsed_time = time.time() - start_time
         handle_result(result_path, elapsed_time)
