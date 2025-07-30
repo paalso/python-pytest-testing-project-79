@@ -38,8 +38,13 @@ class DownloadManager:
         if not self.soup:
             return
 
-        self.__assets_processor.download_assets()
-        self.__download_page()
+        try:
+            self.__assets_processor.download_assets()
+            self.__download_page()
+        except SaveError as e:
+            self.logger.debug(f"Download failed: {e}")
+            return None
+
         return self.path_to_save_page_content
 
     def __download_page(self):

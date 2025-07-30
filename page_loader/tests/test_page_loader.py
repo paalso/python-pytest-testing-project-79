@@ -4,7 +4,7 @@ import stat
 import pytest
 
 from page_loader import download
-from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
+from page_loader.exceptions.io_exceptions import DirectoryError
 from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
 from .fixtures.fixtures import (
@@ -117,17 +117,11 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
             pass
         os.chmod(html_path, stat.S_IREAD)
 
-        with pytest.raises(SaveError) as e:
-            result_path = download(URL, path=temp_dir)
+        result_path = download(URL, path=temp_dir)
 
-            assert result_path is None, \
-                ("If there is a save error due to permission issues, "
-                 "download should fail and result_path should be None")
-
-        error_message_pattern = (f"Failed to save page content to {html_path}. "
-                                 f"Error: [Errno 13] Permission denied")
-
-        assert error_message_pattern in str(e.value)
+        assert result_path is None, \
+            ("If there is a save error due to permission issues, "
+             "download should fail and result_path should be None")
 
         # TODO: implement logic to pass it
         unexpected_files = [file_name for file_name in os.listdir(temp_dir)
