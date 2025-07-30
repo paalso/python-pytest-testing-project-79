@@ -77,6 +77,9 @@ class AssetsProcessor:
 
     # TODO: maybe refactor using page_loader.url_utils.full_url?
     def __get_full_url(self, asset_path):
+        if not url_utils.extension(asset_path):
+            asset_path = f"{asset_path.rstrip('/')}.html"
+
         if url_utils.domain(asset_path):
             self.__logger.debug(f'Asset is an absolute URL: {asset_path}')
             return asset_path
