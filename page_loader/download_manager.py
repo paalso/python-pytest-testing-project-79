@@ -44,7 +44,6 @@ class DownloadManager:
         except SaveError as e:
             self.logger.debug(f"Download failed: {e}")
             return None
-
         return self.path_to_save_page_content
 
     def __download_page(self):
@@ -56,7 +55,8 @@ class DownloadManager:
 
     def __save_page_content(self, content):
         try:
-            with open(self.path_to_save_page_content, 'w') as f:
+            with open(self.path_to_save_page_content,
+                      'w', encoding='utf-8') as f:
                 f.write(content)
             self.logger.debug(
                 f"Page content from '{self.url}' downloaded successfully "
@@ -65,9 +65,13 @@ class DownloadManager:
         except OSError as e:
             error_message = (f"Failed to save page content to "
                              f"{self.path_to_save_page_content}. Error: {e}")
+            self.logger.debug(error_message)
+
+            if os.path.exists(self.path_to_save_page_content):
+                os.remove(self.path_to_save_page_content)
 
             self.__assets_processor.remove_assets_dir()
-            self.logger.debug(error_message)
+
             raise SaveError(error_message)
 
     def __get_soup(self):
