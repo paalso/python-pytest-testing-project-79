@@ -32,6 +32,8 @@ def test_download_html(
         )
         assert result_path == html_path, \
             "Downloaded HTML file path should match the expected path"
+        # import pdb; pdb.set_trace()
+
         with open(result_path, 'r') as f:
             assert compare_prettified_htmls(f.read(), expected_content), \
                 "Downloaded HTML content should match the expected content"
@@ -128,9 +130,9 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
         assert error_message_pattern in str(e.value)
 
         # TODO: implement logic to pass it
-        # import pdb; pdb.set_trace()
         unexpected_files = [file_name for file_name in os.listdir(temp_dir)
                             if file_name != CONTENT_FILE]
+        # import pdb; pdb.set_trace()
         assert not any(unexpected_files), \
             (f'No files (except for {CONTENT_FILE}) should remain in '
              f'the destination directory if the download fails.')

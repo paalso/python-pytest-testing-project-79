@@ -54,10 +54,11 @@ class AssetsProcessor:
         if self.__should_ignore_host(asset_url):
             return False
 
-        asset_full_url = self.__get_full_url(asset_url, asset)
-        path_to_save = self.__get_path_to_save_asset(asset_full_url)
-        self.__download_asset(asset_full_url, path_to_save)
-        self.__update_asset_link(asset, asset_full_url)
+        asset_request_url = self.__get_request_url(asset_url)
+        asset_url_for_link = self.__get_url_for_link(asset_request_url)
+        path_to_save = self.__get_path_to_save_asset(asset_url_for_link)
+        self.__download_asset(asset_request_url, path_to_save)
+        self.__update_asset_link(asset, asset_url_for_link)
         return True
 
     def __should_ignore_host(self, asset_path):
@@ -73,6 +74,24 @@ class AssetsProcessor:
         asset_link_attr = self.__get_asset_link_attr(asset)
         url = asset.get(asset_link_attr)
         self.__logger.debug(f'Asset URL: {url}')
+        return url
+
+    def __get_request_url(self, url):
+        if url_utils.domain(url):
+            self.__logger.debug(f'Asset is an absolute URL: {url}')
+            return url
+
+        if url_utils.is_absolute_path(url):
+            full_url = f'{self.__full_domain}{url}'
+            self.__logger.debug(f'Full URL for absolute path: {full_url}')
+            return full_url
+
+        full_url = f'{self.__base_url}{url}'
+        return full_url
+
+    def __get_url_for_link(self, url):
+        if not url_utils.extension(url):
+            url = f"{url.rstrip('/')}.html"
         return url
 
     def __get_full_url(self, asset_path, asset):

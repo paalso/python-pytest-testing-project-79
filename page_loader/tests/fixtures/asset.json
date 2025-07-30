@@ -35,13 +35,8 @@
         "path": "ru-hexlet-io-courses.html"
     },
     {
-        "url": "https://ru.hexlet.io/site",
-        "content": "<html>Your retrieved manifest here</html>",
-        "path": "ru-hexlet-io-site"
-    },
-    {
-        "url": "https://ru.hexlet.io/search",
-        "content": "<html>Your retrieved search content here</html>",
-        "path": "ru-hexlet-io-search"
+        "url": "https://ru.hexlet.io/courses/blog/about",
+        "content": "<html>Your retrieved blog about manifest here</html>",
+        "path": "ru-hexlet-io-courses-blog-about.html"
     }
 ]
