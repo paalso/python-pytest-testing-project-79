@@ -108,6 +108,7 @@ def test_file_name():
 def test_extension():
     assert extension('https://lorem.dot.net/lib/bio.dhtml') == 'dhtml'
     assert extension('https://lorem.dot.net/some_web_page/') == ''
+    assert extension('https://lorem.dot.net/some_web_page') == ''
 
 
 def test_is_absolute_path():
