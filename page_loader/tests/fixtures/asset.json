@@ -32,6 +32,6 @@
     {
         "url": "https://ru.hexlet.io/courses.html",
         "content": "<html>Your retrieved content here</html>",
-        "path": "ru-hexlet-io-courses.html"
+        "path": "ru-hexlet-io-courses"
     }
 ]

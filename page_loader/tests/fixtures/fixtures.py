@@ -46,7 +46,7 @@ def retrieved_content(filename):
 def expected_content():
     """
     Fixture to read and return the expected HTML content from
-    'expected.html' file.
+    '`expected.html' file.
     """
     with open(os.path.join(current_file_directory, 'expected.html')) as f:
         return f.read()
