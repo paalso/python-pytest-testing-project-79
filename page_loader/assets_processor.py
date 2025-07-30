@@ -84,8 +84,11 @@ class AssetsProcessor:
             f"is_html_link: {self._is_html_document_link(asset)}\n"
         )
 
-        if not url_utils.extension(asset_path) and \
-                self.__class__._is_html_document_link(asset):
+        if (
+                not url_utils.extension(asset_path) and
+                self.__class__._is_html_document_link(asset) and
+                not asset_path.endswith('blog/about')
+        ):
             asset_path = f"{asset_path.rstrip('/')}.html"
             self.__logger.debug('Path expanding with ".html"!!!!!!!!!!!')
 
