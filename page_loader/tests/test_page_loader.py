@@ -195,3 +195,10 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
         assert not any(unexpected_files), \
             (f'No files (except for {CONTENT_FILE}) should remain in '
              f'the destination directory if the download fails.')
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason='Cannot test permissions as root')
+def test_no_permission_to_output_directory():
+    restricted_dir = '/root/protected'  # на Unix-системах
+    with pytest.raises(DirectoryError):
+        download(URL, path=restricted_dir)
