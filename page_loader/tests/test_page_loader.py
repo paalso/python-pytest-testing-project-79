@@ -120,16 +120,17 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
         result_path = download(URL, path=temp_dir)
 
         assert result_path is None, \
-            ("If there is a save error due to permission issues, "
-             "download should fail and result_path should be None")
+            ('If there is a save error due to permission issues, '
+             'download should fail and result_path should be None')
 
-        # TODO: implement logic to pass it
-        unexpected_files = [file_name for file_name in os.listdir(temp_dir)
-                            if file_name != CONTENT_FILE]
+        assert not os.path.exists(html_path), (
+            f'{CONTENT_FILE} should be removed if saving fails')
+
         # import pdb; pdb.set_trace()
-        assert not any(unexpected_files), \
-            (f'No files (except for {CONTENT_FILE}) should remain in '
-             f'the destination directory if the download fails.')
+        remaining_files = os.listdir(temp_dir)
+        assert not remaining_files, (
+            f'No files should remain in directory after failed download, '
+            f'but found: {remaining_files}')
 
 
 # Test the processing of a missing destination directory during download
