@@ -195,3 +195,37 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
         assert not any(unexpected_files), \
             (f'No files (except for {CONTENT_FILE}) should remain in '
              f'the destination directory if the download fails.')
+
+
+@pytest.mark.parametrize(
+    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
+def test_save_error_permission_issue_on_directory(
+        filename, setup_mocking, tmp_path):
+    with setup_mocking:
+        protected_dir = tmp_path / 'protected_dir'
+        protected_dir.mkdir()
+
+        html_path = protected_dir / CONTENT_FILE
+        with open(html_path, 'w'):
+            pass
+
+        os.chmod(protected_dir, stat.S_IREAD | stat.S_IEXEC)
+
+        with pytest.raises(SaveError) as e:
+            result_path = download(URL, path=str(protected_dir))
+
+            assert result_path is None, (
+                'If there is a save error due to directory permission issues, '
+                'download should fail and result_path should be None'
+            )
+
+        error_message_pattern = (f'Failed to save page content to {html_path}. '
+                                 f'Error: [Errno 13] Permission denied')
+        assert error_message_pattern in str(e.value)
+
+        unexpected_files = [file_name for file_name in os.listdir(protected_dir)
+                            if file_name != CONTENT_FILE]
+        assert not any(unexpected_files), (
+            f'No files (except for {CONTENT_FILE}) should remain in '
+            f'the destination directory if the download fails.'
+        )
