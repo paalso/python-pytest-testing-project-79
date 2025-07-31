@@ -98,7 +98,6 @@ class DownloadManager:
         directory = os.path.dirname(self.path_to_save_page_content) or \
                     os.getcwd()
         if not os.access(directory, os.W_OK):
-            self._handle_save_error()
             raise SaveError(f'No write permission to directory: {directory}')
 
         if os.path.exists(self.path_to_save_page_content):
