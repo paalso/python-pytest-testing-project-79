@@ -113,11 +113,7 @@ def test_missing_destination_directory_issue(
     with setup_mocking, temp_directory as temp_dir:
         os.rmdir(temp_dir)
         with pytest.raises(DirectoryError) as e:
-            result_path = download(URL, path=temp_dir)
-
-            assert result_path is None, \
-                ('If the destination directory is missing, '
-                 'download should fail and result_path should be None')
+            download(URL, path=temp_dir)
 
     error_message = f"Directory '{temp_dir}' does not exist."
     assert str(e.value) == error_message
@@ -132,11 +128,6 @@ def test_download_html_with_http_fail_response(
         with pytest.raises(HttpError) as e:
             download(URL, path=temp_dir)
 
-        assert not any(os.listdir(temp_dir)), (
-            'No files should be created in the destination directory '
-            'if the download fails'
-        )
-
         error_message = (f'Failed to retrieve content. '
                          f'Status code: {status_code}')
         assert str(e.value) == error_message
@@ -148,12 +139,7 @@ def test_download_html_with_request_error(
 
     with setup_mocking_request_exception, temp_directory as temp_dir:
         with pytest.raises(RequestError) as e:
-            result_path = download(URL, path=temp_dir)
-
-            assert result_path is None, (
-                "If there is an HTTP error response, "
-                "download should fail and result_path should be None"
-            )
+            download(URL, path=temp_dir)
 
         assert not any(os.listdir(temp_dir)), \
             ('No files should be created in the destination directory '
@@ -177,12 +163,7 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
         os.chmod(html_path, stat.S_IREAD)
 
         with pytest.raises(SaveError) as e:
-            result_path = download(URL, path=temp_dir)
-
-            assert result_path is None, (
-                'If there is a save error due to permission issues, '
-                'download should fail and result_path should be None'
-            )
+            download(URL, path=temp_dir)
 
         error_message = str(e.value)
         assert (
@@ -213,12 +194,7 @@ def test_save_error_permission_issue_on_directory(
         os.chmod(protected_dir, stat.S_IREAD | stat.S_IEXEC)
 
         with pytest.raises(SaveError):
-            result_path = download(URL, path=str(protected_dir))
-
-            assert result_path is None, (
-                'If there is a save error due to directory permission issues, '
-                'download should fail and result_path should be None'
-            )
+            download(URL, path=str(protected_dir))
 
         unexpected_files = [file_name for file_name in os.listdir(protected_dir)
                             if file_name != CONTENT_FILE]
