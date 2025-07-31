@@ -1,10 +1,11 @@
 import os
+import stat
 
 import pytest
 
 from page_loader import download
-from page_loader.exceptions.io_exceptions import DirectoryError
-from page_loader.exceptions.network_exceptions import HttpError
+from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
+from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
 from .fixtures.fixtures import (
     ASSETS,
@@ -132,23 +133,73 @@ def test_download_html_with_http_fail_response(
         assert str(e.value) == error_message
 
 
-# =========================================================================
+# Test the processing of RequestException during download
+def test_download_html_with_request_error(
+        setup_mocking_request_exception, temp_directory):
 
-# Negative: Unreal URL
-def test_unreal_url(tmp_path):
-    temp = str(tmp_path)
-    with pytest.raises(Exception):
-        download('https://ru.hexlet.io/lol', temp)
+    with setup_mocking_request_exception, temp_directory as temp_dir:
+        with pytest.raises(RequestError) as e:
+            download(URL, path=temp_dir)
+
+        assert not any(os.listdir(temp_dir)), \
+            ('No files should be created in the destination directory '
+             'if the download fails')
+
+        error_message = \
+            ('Failed to retrieve content. '
+             'Error: Some simulated RequestException')
+        assert str(e.value) == error_message
 
 
-# Negative: Unreal output folder
-def test_output_path_not_exist():
-    unexpected_path = 'файл/'
-    with pytest.raises(Exception):
-        download('https://google.com', unexpected_path)
+# TODO: Perhaps the test should be generalized
+# TODO: Or add other scenarios - for example, when there's no enough disk space
+@pytest.mark.parametrize(
+    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
+def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
+    with setup_mocking, temp_directory as temp_dir:
+        html_path = os.path.join(temp_dir, CONTENT_FILE)
+        with open(html_path, 'w'):
+            pass
+        os.chmod(html_path, stat.S_IREAD)
+
+        with pytest.raises(SaveError) as e:
+            download(URL, path=temp_dir)
+
+        error_message = str(e.value)
+        assert (
+                f'Failed to save page content to {html_path}. '
+                f'Error: [Errno 13] Permission denied' in error_message
+                or f'No write permission to file: {html_path}' in error_message
+        )
+        # import pdb; pdb.set_trace()
+        unexpected_files = [file_name for file_name in os.listdir(temp_dir)
+                            if file_name != CONTENT_FILE]
+        assert not any(unexpected_files), \
+            (f'No files (except for {CONTENT_FILE}) should remain in '
+             f'the destination directory if the download fails.')
 
 
-# Negative: Incorrect folder type
-def test_incorrect_output_type():
-    with pytest.raises(Exception):
-        download('https://google.com', 1)
+@pytest.mark.parametrize(
+    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
+def test_save_error_permission_issue_on_directory(
+        filename, setup_mocking, tmp_path):
+    with setup_mocking:
+        protected_dir = tmp_path / 'protected_dir'
+        protected_dir.mkdir()
+
+        html_path = protected_dir / CONTENT_FILE
+        with open(html_path, 'w'):
+            pass
+
+        os.chmod(protected_dir, stat.S_IREAD | stat.S_IEXEC)
+
+        with pytest.raises(SaveError):
+            download(URL, path=str(protected_dir))
+
+        unexpected_files = [file_name for file_name in os.listdir(protected_dir)
+                            if file_name != CONTENT_FILE]
+
+        assert not any(unexpected_files), (
+            f'No files (except for {CONTENT_FILE}) should remain in '
+            f'the destination directory if the download fails.'
+        )
