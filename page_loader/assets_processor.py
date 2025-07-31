@@ -18,16 +18,16 @@ class AssetsProcessor:
             self.__download_manager.path_to_save_page_content)
 
         self.__logger = self.__download_manager.logger
-        self.__log_attributes()
+        self._log_attributes()
 
     def download_assets(self):
-        assets = self.__get_page_assets()
+        assets = self._get_page_assets()
 
-        if not assets or not self.__make_assets_dir():
+        if not assets or not self._make_assets_dir():
             return
 
         processed_assets_results = [
-            self.__process_asset(asset)
+            self._process_asset(asset)
             for asset in assets
         ]
         processed_assets_exist = any(processed_assets_results)
@@ -44,39 +44,39 @@ class AssetsProcessor:
             self.__logger.debug(
                 f'Failed to remove assets directory: {self.__assets_path}: {e}')
 
-    def __get_page_assets(self):
+    def _get_page_assets(self):
         return [asset for tag in self.__download_manager.asset_tags
                 for asset in self.__download_manager.soup.find_all(tag)]
 
-    def __process_asset(self, asset):
-        asset_url = self.__get_asset_url(asset)
+    def _process_asset(self, asset):
+        asset_url = self._get_asset_url(asset)
 
-        if self.__should_ignore_host(asset_url):
+        if self._should_ignore_host(asset_url):
             return False
 
-        asset_request_url = self.__get_request_url(asset_url)
+        asset_request_url = self._get_request_url(asset_url)
         asset_url_for_link = self.__get_url_for_link(asset_request_url)
-        path_to_save = self.__get_path_to_save_asset(asset_url_for_link)
-        self.__download_asset(asset_request_url, path_to_save)
-        self.__update_asset_link(asset, asset_url_for_link)
+        path_to_save = self._get_path_to_save_asset(asset_url_for_link)
+        self._download_asset(asset_request_url, path_to_save)
+        self._update_asset_link(asset, asset_url_for_link)
         return True
 
-    def __should_ignore_host(self, asset_path):
+    def _should_ignore_host(self, asset_path):
         return self.__download_manager.ignore_other_hosts and \
-            self.__is_other_domain(asset_path)
+            self._is_other_domain(asset_path)
 
-    def __update_asset_link(self, asset, asset_full_url):
-        new_asset_link = self.__get_asset_updated_link(asset_full_url)
-        asset_link_attr = self.__get_asset_link_attr(asset)
+    def _update_asset_link(self, asset, asset_full_url):
+        new_asset_link = self._get_asset_updated_link(asset_full_url)
+        asset_link_attr = self._get_asset_link_attr(asset)
         asset[asset_link_attr] = new_asset_link
 
-    def __get_asset_url(self, asset):
-        asset_link_attr = self.__get_asset_link_attr(asset)
+    def _get_asset_url(self, asset):
+        asset_link_attr = self._get_asset_link_attr(asset)
         url = asset.get(asset_link_attr)
         self.__logger.debug(f'Asset URL: {url}')
         return url
 
-    def __get_request_url(self, url):
+    def _get_request_url(self, url):
         if url_utils.domain(url):
             self.__logger.debug(f'Asset is an absolute URL: {url}')
             return url
@@ -94,43 +94,24 @@ class AssetsProcessor:
             url = f"{url.rstrip('/')}.html"
         return url
 
-    def __get_full_url(self, asset_path, asset):
-        self.__logger.debug(
-            "\n⤵️ ------------------ Resolving asset URL ----------------- \n"
-            f"  asset: {asset}\n"
-            f"  path before: {asset_path}\n"
-            f"  ext: {url_utils.extension(asset_path)} | "
-            f"is_html_link: {self._is_html_document_link(asset)}\n"
-        )
-
+    def _get_full_url(self, asset_path, asset):
         if not url_utils.extension(asset_path) and \
                 self.__class__._is_html_document_link(asset):
             asset_path = f"{asset_path.rstrip('/')}.html"
-            self.__logger.debug('Path expanding with ".html"!!!!!!!!!!!')
 
         if url_utils.domain(asset_path):
-            self.__logger.debug(f'Asset is an absolute URL: {asset_path}')
             return asset_path
 
         if url_utils.is_absolute_path(asset_path):
             full_url = f'{self.__full_domain}{asset_path}'
-            self.__logger.debug(f'Full URL for absolute path: {full_url}')
             return full_url
-
-        self.__logger.debug(
-            f'Conditions for path expanding: '
-            f'{not url_utils.extension(asset_path)} and '
-            f'{self.__class__._is_html_document_link(asset)}')
-
-        self.__logger.debug(f'asset_path AFTER: {asset_path}')
-        self.__logger.debug('---------------------------------------------\n')
 
         full_url = f'{self.__base_url}{asset_path}'
         self.__logger.debug(f'Full URL for relative path: {full_url}')
         return full_url
 
     # TODO: test it
-    def __make_assets_dir(self):
+    def _make_assets_dir(self):
         try:
             os.makedirs(self.__assets_path)
             self.__logger.debug(
@@ -144,21 +125,21 @@ class AssetsProcessor:
 
     # TODO: Maybe refactoring is needed again
     # TODO: Move an asset processing logic to a separate class
-    def __get_asset_updated_link(self, asset_full_url):
+    def _get_asset_updated_link(self, asset_full_url):
         base_path_to_save = url_utils.filename_from_full_url(asset_full_url)
         updated_link = os.path.join(
             self.__download_manager.assets_dir, base_path_to_save)
         self.__logger.debug(f'Updated asset link: {updated_link}')
         return updated_link
 
-    def __get_path_to_save_asset(self, asset_full_url):
-        asset_new_link = self.__get_asset_updated_link(asset_full_url)
+    def _get_path_to_save_asset(self, asset_full_url):
+        asset_new_link = self._get_asset_updated_link(asset_full_url)
         path_to_save = os.path.join(
             self.__download_manager.path, asset_new_link)
         self.__logger.debug(f'Path to save asset: {path_to_save}')
         return path_to_save
 
-    def __get_asset_link_attr(self, asset):
+    def _get_asset_link_attr(self, asset):
         asset_name = asset.name
         return self.__download_manager.asset_tags[asset_name]
 
@@ -173,12 +154,12 @@ class AssetsProcessor:
             return 'canonical' in rel.lower()
         return False
 
-    def __is_other_domain(self, asset_url):
+    def _is_other_domain(self, asset_url):
         asset_domain = url_utils.domain(asset_url)
         return asset_domain != '' and asset_domain != self.__domain
 
     # TODO: test it
-    def __download_asset(self, url, save_path):
+    def _download_asset(self, url, save_path):
         try:
             response = requests.get(url)
             if response.ok:
@@ -195,7 +176,7 @@ class AssetsProcessor:
             self.__logger.debug(f"Failed to download asset file '{url}'. "
                                 f"Error: {e}")
 
-    def __log_attributes(self):
+    def _log_attributes(self):
         self.__logger.debug(f'{self.__class__.__name__} initialized')
         self.__logger.debug(f'domain: {self.__domain}')
         self.__logger.debug(f'base_url: {self.__base_url}')

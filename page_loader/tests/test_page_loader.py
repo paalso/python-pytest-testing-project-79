@@ -4,7 +4,7 @@ import stat
 import pytest
 
 from page_loader import download
-from page_loader.exceptions.io_exceptions import DirectoryError
+from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
 from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
 from .fixtures.fixtures import (
@@ -130,19 +130,15 @@ def test_download_html_with_http_fail_response(
 
     with setup_mocking_http_fail_response, temp_directory as temp_dir:
         with pytest.raises(HttpError) as e:
-            result_path = download(URL, path=temp_dir)
+            download(URL, path=temp_dir)
 
-            assert result_path is None, (
-                "If there is an HTTP error response, "
-                "download should fail and result_path should be None"
-            )
-
-        assert not any(os.listdir(temp_dir)), \
-            ('No files should be created in the destination directory '
-             'if the download fails')
+        assert not any(os.listdir(temp_dir)), (
+            'No files should be created in the destination directory '
+            'if the download fails'
+        )
 
         error_message = (f'Failed to retrieve content. '
-                         f'Server returned status code {status_code}')
+                         f'Status code: {status_code}')
         assert str(e.value) == error_message
 
 
@@ -169,25 +165,33 @@ def test_download_html_with_request_error(
         assert str(e.value) == error_message
 
 
-@pytest.mark.parametrize('filename', ['retrieved.html'])
-def test_download_returns_none_when_saving_html_fails(
-        filename, setup_mocking, temp_directory):
-    """Test that download() returns None if saving the HTML file fails due
-    to permission issues."""
+# TODO: Perhaps the test should be generalized
+# TODO: Or add other scenarios - for example, when there's no enough disk space
+@pytest.mark.parametrize(
+    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
+def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
     with setup_mocking, temp_directory as temp_dir:
         html_path = os.path.join(temp_dir, CONTENT_FILE)
-
-        with open(html_path, 'w') as f:
-            f.write('placeholder')
-
+        with open(html_path, 'w'):
+            pass
         os.chmod(html_path, stat.S_IREAD)
 
-        result = download(URL, path=temp_dir)
+        with pytest.raises(SaveError) as e:
+            result_path = download(URL, path=temp_dir)
 
-        assert result is None, \
-            'download() should return None if saving the HTML file fails'
+            assert result_path is None, \
+                ('If there is a save error due to permission issues, ' 
+                 'download should fail and result_path should be None')
 
-        # Ensure the file is either removed or empty after a failed save attempt
-        assert not os.path.exists(html_path) or \
-               os.path.getsize(html_path) == 0, \
-            'The HTML file should be removed or empty after a failed download'
+        error_message_pattern = (f'Failed to save page content to {html_path}. '
+                                 f'Error: [Errno 13] Permission denied')
+
+        assert error_message_pattern in str(e.value)
+
+        # TODO: implement logic to pass it
+        # import pdb; pdb.set_trace()
+        unexpected_files = [file_name for file_name in os.listdir(temp_dir)
+                            if file_name != CONTENT_FILE]
+        assert not any(unexpected_files), \
+            (f'No files (except for {CONTENT_FILE}) should remain in '
+             f'the destination directory if the download fails.')

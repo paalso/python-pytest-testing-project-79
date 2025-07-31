@@ -55,36 +55,29 @@ def handle_result(result_path, elapsed_time):
         sys.exit(os.EX_OK)
 
 
-def download(info_logger, error_logger, args):  # noqa: C901
+def run_download(info_logger, error_logger, args):  # noqa: C901
     try:
         start_time = time.time()
-        download_manager = DownloadManager(args.url, args.output)
-        result_path = download_manager.download()
+        manager = DownloadManager(args.url, args.output)
+        result_path = manager.download()
 
         if result_path is None:
             error_logger.error(
                 f'Failed to download page: no content at {args.url}')
             sys.exit(os.EX_OSFILE)
 
-        log_download_info(info_logger, download_manager)
-        elapsed_time = time.time() - start_time
-        handle_result(result_path, elapsed_time)
+        log_download_info(info_logger, manager)
+        handle_result(result_path, time.time() - start_time)
 
-    except HttpError as e:
+    except (HttpError, RequestError, SaveError, DirectoryError) as e:
         error_logger.error(e)
-        sys.exit(os.EX_PROTOCOL)
-
-    except RequestError as e:
-        error_logger.error(e)
-        sys.exit(os.EX_UNAVAILABLE)
-
-    except SaveError as e:
-        error_logger.error(e)
-        sys.exit(os.EX_OSFILE)
-
-    except DirectoryError as e:
-        error_logger.error(e)
-        sys.exit(os.EX_IOERR)
+        exit_codes = {
+            HttpError: os.EX_PROTOCOL,
+            RequestError: os.EX_UNAVAILABLE,
+            SaveError: os.EX_OSFILE,
+            DirectoryError: os.EX_IOERR,
+        }
+        sys.exit(exit_codes[type(e)])
 
     except Exception as e:
         error_logger.error(f'Some unexpected error:\n{e}')
@@ -98,7 +91,7 @@ def main():
     error_logger = logging.getLogger('error_logger')
 
     log_arguments(info_logger, args)
-    download(info_logger, error_logger, args)
+    run_download(info_logger, error_logger, args)
 
 
 if __name__ == '__main__':
