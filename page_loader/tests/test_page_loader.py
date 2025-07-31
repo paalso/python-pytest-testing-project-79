@@ -186,7 +186,13 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
 
         error_message = str(e.value)
         assert (
-            f'Failed to save page content to {html_path}. '
-            f'Error: [Errno 13] Permission denied' in error_message
-            or f'No write permission to file: {html_path}' in error_message
+                f'Failed to save page content to {html_path}. '
+                f'Error: [Errno 13] Permission denied' in error_message
+                or f'No write permission to file: {html_path}' in error_message
         )
+        # import pdb; pdb.set_trace()
+        unexpected_files = [file_name for file_name in os.listdir(temp_dir)
+                            if file_name != CONTENT_FILE]
+        assert not any(unexpected_files), \
+            (f'No files (except for {CONTENT_FILE}) should remain in '
+             f'the destination directory if the download fails.')

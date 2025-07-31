@@ -88,7 +88,7 @@ class DownloadManager:
                 f"Page content from '{self.url}' downloaded successfully "
                 f"and saved to '{self.path_to_save_page_content}'")
         except Exception as e:
-            self._handle_save_error(e)
+            self._handle_save_error()
             raise SaveError(
                 f'Failed to save page content to '
                 f'{self.path_to_save_page_content}. Error: {e}'
@@ -98,18 +98,19 @@ class DownloadManager:
         directory = os.path.dirname(self.path_to_save_page_content) or \
                     os.getcwd()
         if not os.access(directory, os.W_OK):
+            self._handle_save_error()
             raise SaveError(f'No write permission to directory: {directory}')
 
         if os.path.exists(self.path_to_save_page_content):
             if not os.access(self.path_to_save_page_content, os.W_OK):
+                self._handle_save_error()
                 raise SaveError(f'No write permission to file: '
                                 f'{self.path_to_save_page_content}')
 
     def _process_html(self):
         return self.soup.prettify() if self._prettify else str(self.soup)
 
-    def _handle_save_error(self, error):
-        self.logger.debug(f'Save failed: {error}')
+    def _handle_save_error(self):
         if os.path.exists(self.path_to_save_page_content):
             os.remove(self.path_to_save_page_content)
         if hasattr(self, 'assets_processor'):
