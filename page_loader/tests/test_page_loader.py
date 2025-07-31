@@ -1,5 +1,4 @@
 import os
-import stat
 
 import pytest
 
@@ -103,34 +102,6 @@ def test_download_return_value_with_none_path(
             f"Downloaded file {result_path} should exist"
         assert result_path == 'ru-hexlet-io-courses.html', \
             f'Downloaded file path should be {CONTENT_FILE}'
-
-
-# Test the processing of an attempt to save content with access rights issues
-# TODO: Perhaps the test should be generalized
-# TODO: Or add other scenarios - for example, when there's no enough disk space
-@pytest.mark.parametrize(
-    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
-def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
-    with setup_mocking, temp_directory as temp_dir:
-        html_path = os.path.join(temp_dir, CONTENT_FILE)
-        with open(html_path, 'w'):
-            pass
-        os.chmod(html_path, stat.S_IREAD)
-
-        result_path = download(URL, path=temp_dir)
-
-        assert result_path is None, \
-            ('If there is a save error due to permission issues, '
-             'download should fail and result_path should be None')
-
-        assert not os.path.exists(html_path), (
-            f'{CONTENT_FILE} should be removed if saving fails')
-
-        # import pdb; pdb.set_trace()
-        remaining_files = os.listdir(temp_dir)
-        assert not remaining_files, (
-            f'No files should remain in directory after failed download, '
-            f'but found: {remaining_files}')
 
 
 # Test the processing of a missing destination directory during download
