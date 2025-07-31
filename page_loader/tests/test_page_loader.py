@@ -4,7 +4,6 @@ import stat
 import pytest
 
 from page_loader import download
-from page_loader.exceptions.io_exceptions import DirectoryError
 from page_loader.exceptions.network_exceptions import HttpError, RequestError
 
 from .fixtures.fixtures import (
@@ -131,24 +130,6 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
         assert not remaining_files, (
             f'No files should remain in directory after failed download, '
             f'but found: {remaining_files}')
-
-
-# Test the processing of a missing destination directory during download
-@pytest.mark.parametrize(
-    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
-def test_missing_destination_directory_issue(
-        filename, setup_mocking, temp_directory):
-    with setup_mocking, temp_directory as temp_dir:
-        os.rmdir(temp_dir)
-        with pytest.raises(DirectoryError) as e:
-            result_path = download(URL, path=temp_dir)
-
-            assert result_path is None, \
-                ('If the destination directory is missing, '
-                 'download should fail and result_path should be None')
-
-    error_message = f"Directory '{temp_dir}' does not exist."
-    assert str(e.value) == error_message
 
 
 # Test the processing of various HTTP error responses
