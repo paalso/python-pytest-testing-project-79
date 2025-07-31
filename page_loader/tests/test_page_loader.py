@@ -1,4 +1,5 @@
 import os
+import stat
 
 import pytest
 
@@ -166,3 +167,52 @@ def test_download_html_with_request_error(
             ('Failed to retrieve content. '
              'Error: Some simulated RequestException')
         assert str(e.value) == error_message
+
+
+@pytest.mark.parametrize(
+    'filename', ['retrieved.html', 'retrieved_without_assets.html'])
+def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
+    with setup_mocking, temp_directory as temp_dir:
+        html_path = os.path.join(temp_dir, CONTENT_FILE)
+        with open(html_path, 'w'):
+            pass
+        os.chmod(html_path, stat.S_IREAD)
+
+        result_path = download(URL, path=temp_dir)
+
+        assert result_path is None, \
+            ('If there is a save error due to permission issues, '
+             'download should fail and result_path should be None')
+
+        assert not os.path.exists(html_path), (
+            f'{CONTENT_FILE} should be removed if saving fails')
+
+        # import pdb; pdb.set_trace()
+        remaining_files = os.listdir(temp_dir)
+        assert not remaining_files, (
+            f'No files should remain in directory after failed download, '
+            f'but found: {remaining_files}')
+
+
+@pytest.mark.parametrize('filename', ['retrieved.html'])
+def test_download_returns_none_when_saving_html_fails(
+        filename, setup_mocking, temp_directory):
+    """Test that download() returns None if saving the HTML file fails due
+    to permission issues."""
+    with setup_mocking, temp_directory as temp_dir:
+        html_path = os.path.join(temp_dir, CONTENT_FILE)
+
+        with open(html_path, 'w') as f:
+            f.write('placeholder')
+
+        os.chmod(html_path, stat.S_IREAD)
+
+        result = download(URL, path=temp_dir)
+
+        assert result is None, \
+            'download() should return None if saving the HTML file fails'
+
+        # Ensure the file is either removed or empty after a failed save attempt
+        assert not os.path.exists(html_path) or \
+               os.path.getsize(html_path) == 0, \
+            'The HTML file should be removed or empty after a failed download'
