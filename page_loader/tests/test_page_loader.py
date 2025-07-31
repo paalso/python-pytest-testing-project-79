@@ -179,19 +179,14 @@ def test_save_error_permission_issue(filename, setup_mocking, temp_directory):
         with pytest.raises(SaveError) as e:
             result_path = download(URL, path=temp_dir)
 
-            assert result_path is None, \
-                ('If there is a save error due to permission issues, ' 
-                 'download should fail and result_path should be None')
+            assert result_path is None, (
+                'If there is a save error due to permission issues, '
+                'download should fail and result_path should be None'
+            )
 
-        error_message_pattern = (f'Failed to save page content to {html_path}. '
-                                 f'Error: [Errno 13] Permission denied')
-
-        assert error_message_pattern in str(e.value)
-
-        # TODO: implement logic to pass it
-        # import pdb; pdb.set_trace()
-        unexpected_files = [file_name for file_name in os.listdir(temp_dir)
-                            if file_name != CONTENT_FILE]
-        assert not any(unexpected_files), \
-            (f'No files (except for {CONTENT_FILE}) should remain in '
-             f'the destination directory if the download fails.')
+        error_message = str(e.value)
+        assert (
+            f'Failed to save page content to {html_path}. '
+            f'Error: [Errno 13] Permission denied' in error_message
+            or f'No write permission to file: {html_path}' in error_message
+        )

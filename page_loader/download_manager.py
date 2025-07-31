@@ -77,6 +77,9 @@ class DownloadManager:
 
     def _save_processed_page(self):
         html = self._process_html()
+
+        self._check_write_permissions()
+
         try:
             with open(self.path_to_save_page_content,
                       'w', encoding='utf-8') as f:
@@ -90,6 +93,17 @@ class DownloadManager:
                 f'Failed to save page content to '
                 f'{self.path_to_save_page_content}. Error: {e}'
             )
+
+    def _check_write_permissions(self):
+        directory = os.path.dirname(self.path_to_save_page_content) or \
+                    os.getcwd()
+        if not os.access(directory, os.W_OK):
+            raise SaveError(f'No write permission to directory: {directory}')
+
+        if os.path.exists(self.path_to_save_page_content):
+            if not os.access(self.path_to_save_page_content, os.W_OK):
+                raise SaveError(f'No write permission to file: '
+                                f'{self.path_to_save_page_content}')
 
     def _process_html(self):
         return self.soup.prettify() if self._prettify else str(self.soup)
