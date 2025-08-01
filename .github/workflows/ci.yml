@@ -35,9 +35,19 @@ jobs:
     - name: Install uv
       run: pip install uv
 
-    # Принципиальный момент: зависимостях нужно установить явно
     - name: Install project dependencies with uv
       run: make sync
 
-    - name: Run pytest and linter
-      run: make check
+    - name: Run linters
+      run: make lint
+
+    - name: Run tests with coverage
+      run: make cov
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-coverage
+        fail_ci_if_error: true

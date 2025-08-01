@@ -46,8 +46,11 @@ format:  ## Format code with Ruff
 test:  ## Run tests
 	uv run pytest -v $(NAME)
 
-test-cov:  ## Run tests with coverage
-	uv run pytest --cov
+cov:  ## Run tests with coverage report
+	@uv run coverage run -m pytest
+	@uv run coverage report -m
+	@uv run coverage html && echo "Open htmlcov/index.html"
+	@uv run coverage xml
 
 test-coverage:  ## Full coverage report for `page_loader`
 	uv run pytest --cov=page_loader --cov-report xml
@@ -55,5 +58,7 @@ test-coverage:  ## Full coverage report for `page_loader`
 check:  ## Run lint + test
 	$(MAKE) lint
 	$(MAKE) test
+
+qa: check  ## Alias for `make check`
 
 .PHONY: sync install-dist selfcheck build run lint format test test-cov test-coverage check
