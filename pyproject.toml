@@ -1,6 +1,6 @@
 [project]
 name = "hexlet-code"
-version = "0.1.0"
+version = "1.0.0"
 description = "A command line utility to download web pages from the Internet to the local machine."
 authors = [
     { name = "paalso", email = "40a.pvl@gmail.com" },

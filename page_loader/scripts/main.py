@@ -4,6 +4,7 @@ import os
 import sys
 import time
 
+from page_loader.__version__ import __version__
 from page_loader.download_manager import DownloadManager
 from page_loader.exceptions.io_exceptions import DirectoryError, SaveError
 from page_loader.exceptions.network_exceptions import HttpError, RequestError
@@ -16,6 +17,12 @@ def parse_args():
         '-o', '--output',
         help='Output directory',
         default=os.getcwd()
+    )
+    parser.add_argument(
+        '-v', '--version',
+        action='version',
+        version=f'Page downloader {__version__}',
+        help='Show the program version and exit.'
     )
     return parser.parse_args()
 
