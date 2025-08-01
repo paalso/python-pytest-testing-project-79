@@ -1,7 +1,11 @@
 # Page Loader
 
-[![Python CI](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/ci.yml/badge.svg)](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/ci.yml) 
-[![Actions Status](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/paalso/python-pytest-testing-project-79/actions) 
+[![Python CI](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/ci.yml/badge.svg)](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/paalso/python-pytest-testing-project-79/graph/badge.svg?token=hqXpd2u08R)](https://codecov.io/gh/paalso/python-pytest-testing-project-79)
+
+<!--
+[![Actions Status](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/paalso/python-pytest-testing-project-79/actions)
+-->
 
 ### Practical task for Hexlet track [Python Pytest Testing](https://ru.hexlet.io/programs/python-pytest-testing), program [Python developer](https://ru.hexlet.io/programs/python)
 
