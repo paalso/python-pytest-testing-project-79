@@ -7,9 +7,9 @@
 [![Actions Status](https://github.com/paalso/python-pytest-testing-project-79/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/paalso/python-pytest-testing-project-79/actions)
 -->
 
-### Practical task for Hexlet track [Python Pytest Testing](https://ru.hexlet.io/programs/python-pytest-testing), program [Python developer](https://ru.hexlet.io/programs/python)
+### Practical task for track Python Pytest Testing, program Python developer
 
-## [Загрузчик страниц (Page Loader)](https://ru.hexlet.io/programs/python-pytest-testing/projects/79)
+## Загрузчик страниц (Page Loader)
 
 #### A command line utility / library to download web pages from the Internet to the local machine
 
